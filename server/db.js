@@ -1,0 +1,299 @@
+// Import packages here
+
+const pg = require('pg');
+const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/forward_db');
+const uuid = require('uuid');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const JWT = process.env.JWT || 'shhh';
+
+// Create tables here
+
+const createTables = async()=> {
+  const SQL = `
+
+    DROP TABLE IF EXISTS scheduled_events CASCADE;
+    DROP TABLE IF EXISTS favorite_courts CASCADE;
+    DROP TABLE IF EXISTS users CASCADE;
+    DROP TABLE IF EXISTS cities CASCADE;
+    DROP TABLE IF EXISTS sports CASCADE;
+    DROP TABLE IF EXISTS courts CASCADE;
+
+    CREATE TABLE users(
+      id UUID PRIMARY KEY,
+      username VARCHAR(255) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      photoURL VARCHAR(255) 
+    );
+
+    CREATE TABLE cities(
+      id UUID PRIMARY KEY,
+      name VARCHAR(100) NOT NULL UNIQUE
+    );
+
+    CREATE TABLE sports(
+      id UUID PRIMARY KEY,
+      name VARCHAR(100) NOT NULL UNIQUE
+    );
+
+     CREATE TABLE courts(
+      id UUID PRIMARY KEY,
+      name VARCHAR(500) NOT NULL,
+      googleMapsLink VARCHAR(1000) NOT NULL UNIQUE,
+      neighborhood VARCHAR(1000) NOT NULL,
+      publicOrPrivate VARCHAR(1000) NOT NULL,
+      indoorOrOutdoor VARCHAR(1000) NOT NULL,
+      rating INTEGER NOT NULL,
+      review VARCHAR(1000) NOT NULL,
+      photoURL VARCHAR(255),
+      city_id UUID REFERENCES cities(id) NOT NULL
+    );
+
+    CREATE TABLE favorite_courts(
+      id UUID PRIMARY KEY,
+      user_id UUID REFERENCES users(id) NOT NULL,
+      court_id UUID REFERENCES courts(id) NOT NULL
+      
+    );
+
+     CREATE TABLE scheduled_events(
+      id UUID PRIMARY KEY,
+      dateTime VARCHAR(1000) NOT NULL,
+      user_id UUID REFERENCES users(id) NOT NULL,
+      court_id UUID REFERENCES courts(id) NOT NULL
+      
+    );
+  `;
+  await client.query(SQL);
+
+};
+
+// Create user, cities, sports, courts, favorite courts, scheduled events here
+
+const createUser = async({ username, password, name, email, photoURL })=> {
+  const SQL = `
+    INSERT INTO users(id, username, password, name, email, photoURL) VALUES($1, $2, $3, $4, $5, $6) RETURNING *
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), username, await bcrypt.hash(password, 5), name, email, photoURL]);
+  return response.rows[0];
+};
+
+const createCity = async({ name })=> {
+  const SQL = `
+    INSERT INTO cities(id, name) VALUES ($1, $2) RETURNING * 
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), name]);
+  return response.rows[0];
+};
+
+const createSport = async({ name })=> {
+  const SQL = `
+    INSERT INTO sports(id, name) VALUES ($1, $2) RETURNING * 
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), name]);
+  return response.rows[0];
+};
+
+const createCourt = async({ name, googleMapsLink, neighborhood, publicOrPrivate, indoorOrOutdoor, rating, review, photoURL, city_id})=> {
+  const SQL = `
+    INSERT INTO courts(id, name, googleMapsLink, neighborhood, publicOrPrivate, indoorOrOutdoor, rating, review, photoURL, city_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING * 
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), name, googleMapsLink, neighborhood, publicOrPrivate, indoorOrOutdoor, rating, review, photoURL, city_id]);
+  return response.rows[0];
+};
+
+const createFavoriteCourts = async({ user_id, court_id })=> {
+  const SQL = `
+    INSERT INTO favorite_courts(id, user_id, court_id) VALUES ($1, $2, $3) RETURNING * 
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), user_id, court_id]);
+  return response.rows[0];
+};
+
+const createScheduledEvents = async({ dateTime, user_id, court_id })=> {
+  const SQL = `
+    INSERT INTO scheduled_events(id, dateTime, user_id, court_id) VALUES ($1, $2, $3, $4) RETURNING * 
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), dateTime, user_id, court_id]);
+  return response.rows[0];
+};
+
+// Authenticate function here
+
+const authenticate = async({ username, password })=> {
+  const SQL = `
+    SELECT id, password
+    FROM users
+    WHERE username = $1
+  `;
+  const response = await client.query(SQL, [ username ]);
+  if(!response.rows.length || (await bcrypt.compare(password, response.rows[0].password)===false)){
+    const error = Error('not authorized');
+    error.status = 401;
+    throw error;
+  }
+  const token = await jwt.sign({id:response.rows[0].id}, JWT);
+  console.log(token);
+  return {token};
+};
+
+// Register function here: createNewUser
+
+const createNewUser = async({ username, password }) => {
+
+  const SQL = `
+    SELECT id, password
+    FROM users
+    WHERE username = $1
+  `;
+  const response = await client.query(SQL, [ username ]);
+
+  if(response.rows.length) {
+
+    const error = Error('username exists, please use another');
+    error.status = 401;
+    throw error;
+  }; 
+
+  const user = await createUser({ username, password });
+
+  const token = await jwt.sign({id:user.id}, JWT);
+  console.log(token);
+  return {token};
+
+};
+
+// Create methods for fetching users, cities, sports, courts, favorite courts, scheduled events here
+
+
+const fetchUsers = async()=> {
+  const SQL = `
+    SELECT id, username 
+    FROM users
+  `;
+  const response = await client.query(SQL);
+  return response.rows;
+};
+
+const fetchCities = async()=> {
+  const SQL = `
+    SELECT *
+    FROM cities
+  `;
+  const response = await client.query(SQL);
+  return response.rows;
+};
+
+const fetchSports = async()=> {
+  const SQL = `
+    SELECT *
+    FROM sports
+  `;
+  const response = await client.query(SQL);
+  return response.rows;
+};
+
+const fetchCourts = async()=> {
+  const SQL = `
+    SELECT *
+    FROM courts
+  `;
+  const response = await client.query(SQL);
+  return response.rows;
+};
+
+const fetchFavoriteCourts = async(user_id)=> {
+  const SQL = `
+    SELECT *
+    FROM favorite_courts
+    WHERE user_id = $1
+  `;
+  const response = await client.query(SQL, [ user_id ]);
+  return response.rows;
+};
+
+const fetchScheduledEvents = async(user_id)=> {
+  const SQL = `
+    SELECT *
+    FROM scheduled_events
+    WHERE user_id = $1
+  `;
+  const response = await client.query(SQL, [ user_id ]);
+  return response.rows;
+};
+
+// Create methods to delete Favorite Courts and Scheduled Events
+
+const deleteFavoriteCourts = async({user_id, id})=> {
+  const SQL = `
+    DELETE
+    FROM favorite_courts
+    WHERE user_id = $1 AND id = $2
+  `;
+  await client.query(SQL, [ user_id, id ]);
+};
+
+const deleteScheduledEvents = async({user_id, id})=> {
+  const SQL = `
+    DELETE
+    FROM scheduled_events
+    WHERE user_id = $1 AND id = $2
+  `;
+  await client.query(SQL, [ user_id, id ]);
+};
+
+// Create the findUserByToken for the isLoggedin middleware function
+
+const findUserByToken = async(token) => {
+
+  let id;
+  try{
+    const payload = await jwt.verify(token, JWT);
+    id = payload.id;
+
+  } catch(ex){
+    const error = Error('not authorized');
+      error.status = 401;
+      throw error;
+    
+  }
+  const SQL = `
+    SELECT id, username
+    FROM users
+    WHERE id = $1
+  `;
+  const response = await client.query(SQL, [id]);
+  if(!response.rows.length){
+    const error = Error('not authorized');
+    error.status = 401;
+    throw error;
+  }
+  return response.rows[0];
+
+};
+
+// Export the modules
+
+module.exports = {
+  client,
+  createTables,
+  createUser,
+  createCity,
+  createCourt,
+  createFavoriteCourts,
+  createSport,
+  createScheduledEvents,
+  fetchFavoriteCourts,
+  fetchUsers,
+  fetchCities,
+  fetchSports,
+  fetchCourts,
+  fetchScheduledEvents,
+  deleteFavoriteCourts,
+  deleteScheduledEvents,
+  authenticate,
+  findUserByToken,
+  createNewUser
+};
