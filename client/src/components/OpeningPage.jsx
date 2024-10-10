@@ -14,13 +14,15 @@ const OpeningPage = ({ onAnimationEnd }) => {
       setAnimate(true);
     }, 100);
 
+    const extraDelay = 1000; // Add extra 1-second delay before moving the logo to the left
+
     const fadeOutTimer = setTimeout(() => {
       setAnimateEnd(true);
-    }, 1500); 
+    }, 1500 + extraDelay); // Adjust the timing to include the extra delay
 
     const homepageTimer = setTimeout(() => {
       onAnimationEnd();
-    }, 2500); 
+    }, 2500 + extraDelay); // Adjust the homepage transition timing as well
 
     return () => {
       clearTimeout(fadeInTimer);
