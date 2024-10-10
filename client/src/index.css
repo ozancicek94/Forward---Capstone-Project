@@ -1,0 +1,967 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+
+
+body {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+
+
+body{
+
+
+position: relative;
+/* width: 1440px;
+height: 1024px; */
+
+background: #0033FF;
+margin: 0px;
+}
+
+
+/* Big NY Image */
+
+.bigCityImage{
+
+position: fixed;
+width: 100vw;
+height: 60vh;
+left: 0px;
+top: 0px;
+z-index: -10;
+
+}
+
+/* WhitePage */
+
+.courtList{
+
+  position: absolute;
+  width: 55vw;
+  min-height: 100vh;
+  left: 33vw;
+  top: 392px;
+  padding: 3em;
+  
+  background: #FFFFFF;
+  }
+
+.courtListImages{
+  width: 324px;
+  height: 311px;
+  margin-right: 20px;
+  }
+
+  /* Blending Logo Left */
+
+.leftLogo{
+
+position: fixed;
+width: 156.34px;
+height: 242px;
+left: 215px;
+top: 68vh
+}
+
+.topLogo {
+  position: fixed;
+  margin-top: 2em;
+  margin-left: 6em;
+}
+
+.navbar {
+  position: fixed;       /* Fix the navbar to the page */
+  right: 0;              /* Align the navbar to the right side */
+  top: 62vh;                /* Align the navbar to the top */
+  height: 100vh;         /* Make it take the full height of the viewport */
+  display: flex;         /* Use flexbox for vertical alignment */
+  flex-direction: column; /* Arrange items in a column (top to bottom) */
+  justify-content: flex-start; /* Align the items starting from the top */
+  padding: 0.25em;         /* Optional padding for spacing */
+  font-size: 15px;
+  color: white;
+  text-decoration: none;
+  
+  width: 6vw;          /* Set a width for the navbar */
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  margin-bottom: 2em;   /* Add spacing between navbar items */
+  text-align: right;     /* Align the text to the right */
+}
+
+/* Enforce white color and remove underline for all anchor link states */
+.nav-item a {
+  color: white !important;  /* Force link color to white */
+  text-decoration: none !important; /* Force removal of underline */
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+}
+
+/* Override visited link color and underline */
+.nav-item a:visited {
+  color: white !important;  /* Force visited link color to white */
+  text-decoration: none !important; /* Remove underline from visited links */
+}
+
+/* Change color on hover */
+.nav-item a:hover {
+  color: black!important; /* Change color on hover */
+  text-decoration: underline !important; /* Optional: add underline on hover */
+  background-color: #EDFF1B;
+}
+
+/* Override active link state */
+.nav-item a:active {
+  color: white !important; /* Force active link color to white */
+  text-decoration: none !important; /* Remove underline on active state */
+}
+
+.nav-item img {
+  width: 1.5em; /* Adjust logo size */
+  height: auto;
+  margin-bottom: 1em; /* Space between logo and text */
+}
+
+
+.nav-item span {
+  margin-top: 3em; /* Space between logo and text */
+}
+
+
+.content{
+  display: flex;
+  flex-direction: column;
+  margin-top: 3em;
+  width: 30vw;
+  
+}
+
+.loginLabel{
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+Input{
+  height: 2em;
+  margin-bottom: 2em;
+  
+}
+
+Button {
+  background: #0033FF;
+  color: white;
+  height: 3em;
+  outline: 1px solid #0033FF;
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  border: none; /* No border */
+  border-radius: 5px;
+  padding-left: 3em;
+  padding-right: 4em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  /* margin-left: 2em; */
+}
+
+button:hover {
+  background-color: black
+}
+
+.logoutButton{
+  position: fixed;
+  margin-top: 2em;
+  margin-left: 83vw;
+  
+}
+
+.searchCourtsInput{
+  width: 30em;
+  height: 2em;
+
+}
+
+.courtInfo{
+ 
+  
+}
+
+.courtItem {
+  display: flex; /* Align image and content horizontally */
+  /* Vertically center the content next to the image */
+  margin-bottom: 4em; /* Add some space between items */
+  margin-left: 5px; /* Add some space between items */
+  
+  
+}
+
+.courtDetails {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.buttonWrapper {
+  margin-top: auto; /* Push the button to the bottom of the container */
+}
+
+.BasketballIcon{
+
+  height: 3.5em;
+  width: 3.5em;
+
+}
+
+.profilePhoto {
+  border-radius: 50%;
+  width: 16vw;
+  
+}
+
+.topLogo:hover{
+  box-shadow: 0px 10px 0px #EDFF1B;
+  cursor: pointer;
+  background-color: #EDFF1B;
+  
+}
+
+.accountPage {
+  display: flex;
+  justify-content: space-between; /* Space between the left and right sections */
+  padding: 20px;
+}
+
+.leftContent {
+  flex: 1; /* Takes up the remaining space on the left */
+  margin-right: 20px; /* Space between leftContent and rightContent */
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+}
+
+.rightContent {
+  flex: 0 0 300px; /* Fixed width for the right content */
+  display: flex;
+  flex-direction: column; /* Stack profile photo and events vertically */
+}
+
+.schedEvents{
+  border: 1px solid black;
+  margin-top: 5em;
+  padding: 2em
+}
+
+.favCourts{
+  /* border: 1px solid black; */
+  margin-top: 4em;
+}
+
+.singleCourtImage{
+  height: 40vh;
+}
+
+a{
+  font-weight: bold;
+}
+
+a:hover{
+  box-shadow: 0px 10px 0px #EDFF1B;
+  
+}
+
+.courtContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Align content to the top */
+  width: 80%; /* Adjust width as needed */
+}
+
+.courtLeft {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* align-items: center; */
+  
+}
+
+.courtRight {
+  margin-top: 4em;
+  margin-left: 2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%; /* Adjust width as needed */
+}
+
+.ratingReviewText{
+  justify-content: left;
+  
+  margin-right: 1px;
+}
+
+.schedEventInput{ 
+  margin-top: 5em;
+}
+
+
+
+.singleCourtSchedEvent{
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  padding: 3em;
+}
+
+.schedEventsSingleCourt{
+  height: 3em;
+}
+
+.favCourtRemoveButton{
+  margin-left: 3em;
+}
+
+/* Global reset */
+/* Global reset */
+body {
+  font-family: "Space Grotesk", sans-serif;
+  background-color: #0033FF; /* Set global blue background for all pages */
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow-x: hidden; /* Prevent horizontal scrolling, allow vertical scrolling */
+}
+
+/* Styles for the opening animation */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed; /* Fixed to cover the entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white; /* Keep white background during the animation */
+  z-index: 100; /* Ensure it stays on top of everything else */
+}
+
+.openingLogo {
+  opacity: 0;
+  transform: translateX(0);
+  transition: opacity 0.8s ease-in-out, transform 1.5s ease-in-out;
+}
+
+.logo-container.animate .openingLogo {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.logo-container.animate-end .openingLogo {
+  opacity: 0;
+  transform: translateX(-80vw);
+}
+
+/* Home page styles */
+.home-page {
+  opacity: 0;
+  background-color: white; /* Override homepage background to white */
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50; /* Layer it under the opening animation */
+  transition: opacity 1s ease-in-out;
+}
+
+.home-page.fade-in {
+  opacity: 1;
+}
+
+.homepage-content {
+  display: flex;
+  justify-content: space-between;
+  height: 70vh;
+  padding: 2em;
+  margin-left: 15vw;
+  margin-right: 15vw;
+}
+
+.section {
+  margin-top: 5em;
+  width: 45%;
+  text-align: center;
+}
+
+select {
+  width: 60%;
+  padding: 0.5em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: 1rem;
+}
+
+.logo {
+  width: 19vw;
+  height: auto;
+  margin-top: 3em;
+}
+
+.find-courts-button {
+  position: absolute;
+  bottom: 15vh;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.find-courts-button button {
+  background: #0033FF;
+  color: white;
+  height: 3em;
+  outline: 1px solid #0033FF;
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  border: none;
+  border-radius: 5px;
+  padding-left: 3em;
+  padding-right: 4em;
+}
+
+.find-courts-button button:hover {
+  background-color: black;
+}
+
+
+
+
+
+/* Big Blue Rectangle at Bottom */
+
+/* .blueRectangle{
+
+position: fixed;
+
+width: 100vw;
+height: 498px;
+bottom:0px;
+background: #0033FF;
+} */
+
+
+/* Basketball Text */
+
+position: absolute;
+width: 494px;
+height: 59px;
+left: 0px;
+top: 563px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 24px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* WhitePage */
+
+.courtList{
+
+position: absolute;
+width: 853px;
+height: 632px;
+left: 494px;
+top: 392px;
+
+background: #FFFFFF;
+}
+
+
+/* Search Courts Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 324px;
+height: 59px;
+left: 547px;
+top: 443px;
+
+border: 1px solid #000000;
+border-radius: 5px;
+
+
+/* Sport DropDown Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 324px;
+height: 59px;
+left: 97px;
+top: 563px;
+
+border: 1px solid #FFFFFF;
+border-radius: 5px;
+
+
+/* City Dropdown Text */
+
+position: absolute;
+width: 494px;
+height: 59px;
+left: 0px;
+top: 921px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 24px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* City DropDown Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 324px;
+height: 59px;
+left: 97px;
+top: 921px;
+
+border: 1px solid #FFFFFF;
+border-radius: 5px;
+
+
+/* Search Courts... */
+
+position: absolute;
+width: 312px;
+height: 59px;
+left: 559px;
+top: 443px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 24px;
+display: flex;
+align-items: center;
+
+color: #1F2024;
+
+opacity: 0.5;
+
+
+/* Court Photo */
+
+position: absolute;
+width: 324px;
+height: 311px;
+left: 547px;
+top: 606px;
+
+background: url(canalst.jpg);
+
+
+/* Canal Street Basketball Courts */
+
+position: absolute;
+width: 675px;
+height: 51px;
+left: 901px;
+top: 638px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 25px;
+line-height: 30px;
+
+color: #1F2024;
+
+
+
+/* West Village, Manhattan */
+
+position: absolute;
+width: 396px;
+height: 60px;
+left: 901px;
+top: 689px;
+
+font-family: 'Arial';
+font-style: normal;
+font-weight: 400;
+font-size: 15px;
+line-height: 17px;
+
+color: #1F2024;
+
+
+
+/* Gertrude B. Kelly Playground */
+
+position: absolute;
+width: 675px;
+height: 51px;
+left: 901px;
+top: 958px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 25px;
+line-height: 30px;
+
+color: #1F2024;
+
+
+
+/* Chelsea, Manhattan */
+
+position: absolute;
+width: 396px;
+height: 60px;
+left: 901px;
+top: 1009px;
+
+font-family: 'Arial';
+font-style: normal;
+font-weight: 400;
+font-size: 15px;
+line-height: 17px;
+
+color: #1F2024;
+
+
+
+/* See Details Button */
+
+position: absolute;
+width: 162px;
+height: 46px;
+left: 903px;
+top: 856px;
+
+background: #0033FF;
+border-radius: 5px;
+
+
+/* See Details */
+
+position: absolute;
+width: 181px;
+height: 59px;
+left: 894px;
+top: 849px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 18px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* LogoTopLeft */
+
+position: absolute;
+width: 246.39px;
+height: 48px;
+left: 78px;
+top: 19px;
+
+
+
+/* Vector 4 */
+
+position: absolute;
+width: 14.71px;
+height: 40.67px;
+left: 297px;
+top: 23.05px;
+
+background: #2542DA;
+border: 5px solid #EDFF1B;
+transform: rotate(-3.03deg);
+
+
+/* Vector 3 */
+
+position: absolute;
+width: 12.61px;
+height: 40.72px;
+left: 309.97px;
+top: 23.67px;
+
+background: #2542DA;
+border: 5px solid #EDFF1B;
+
+
+/* Vector 1 */
+
+position: absolute;
+width: 12.61px;
+height: 41.08px;
+left: 311.77px;
+top: 22.95px;
+
+background: #0033FF;
+border: 5px solid #0033FF;
+
+
+/* Vector 2 */
+
+position: absolute;
+width: 14.71px;
+height: 40.67px;
+left: 298.9px;
+top: 22.78px;
+
+border: 5px solid #0033FF;
+transform: rotate(-3.03deg);
+
+
+/* FORWARD */
+
+position: absolute;
+width: 219px;
+height: 48px;
+left: 78px;
+top: 19px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 48px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.11em;
+
+color: #0033FF;
+
+
+
+/* Small Basketball Icon */
+
+position: absolute;
+width: 56px;
+height: 56px;
+left: 547px;
+top: 526px;
+
+
+
+/* Group 1 */
+
+position: absolute;
+width: 56px;
+height: 56px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #0033FF;
+border: 1px solid #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 1.69%;
+top: 3.39%;
+bottom: 0%;
+
+background: #FFFFFF;
+
+
+/* Blending Logo Left */
+
+position: absolute;
+width: 156.34px;
+height: 242px;
+left: 152px;
+top: 641px;
+
+
+
+/* Vector 4 */
+
+position: absolute;
+width: 83.98px;
+height: 232.19px;
+left: 152px;
+top: 646.99px;
+
+border: 13px solid #EDFF1B;
+transform: rotate(-3.03deg);
+
+
+/* Vector 3 */
+
+position: absolute;
+width: 72px;
+height: 232.46px;
+left: 226.06px;
+top: 650.54px;
+
+border: 13px solid #EDFF1B;
+
+
+/* Vector 1 */
+
+position: absolute;
+width: 72px;
+height: 234.52px;
+left: 236.34px;
+top: 646.43px;
+
+border: 13px solid #0033FF;
+
+
+/* Vector 2 */
+
+position: absolute;
+width: 83.98px;
+height: 232.19px;
+left: 162.84px;
+top: 645.44px;
+
+border: 13px solid #0033FF;
+transform: rotate(-3.03deg);
+
+
+/* Sport Drop Down Triangle */
+
+position: absolute;
+width: 47px;
+height: 34px;
+left: 361px;
+top: 606px;
+
+background: #FFFFFF;
+transform: matrix(1, 0, 0, -1, 0, 0);
+
+
+/* City DropDown Triangle */
+
+position: absolute;
+width: 47px;
+height: 34px;
+left: 361px;
+top: 964px;
+
+background: #FFFFFF;
+transform: matrix(1, 0, 0, -1, 0, 0);
+
+
+/* My Profile */
+
+position: absolute;
+width: 181px;
+height: 59px;
+left: 1304px;
+top: 610px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 18px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* My Profile Logo */
+
+position: absolute;
+left: 96.11%;
+right: 2.36%;
+top: 57.91%;
+bottom: 39.84%;
+
+background: #FFFFFF;
+
+
+/* Find Courts */
+
+position: absolute;
+width: 181px;
+height: 59px;
+left: 1304px;
+top: 715px;
+
+font-family: 'Px Grotesk';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 18px;
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* FindCourtsLogo */
+
+position: absolute;
+left: 95.76%;
+right: 2.36%;
+top: 68.16%;
+bottom: 29.49%;
+
+background: #FFFFFF;
+
+

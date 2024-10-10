@@ -141,7 +141,7 @@ const authenticate = async({ username, password })=> {
 
 // Register function here: createNewUser
 
-const createNewUser = async({ username, password }) => {
+const createNewUser = async({ username, password, name, email, photoURL }) => {
 
   const SQL = `
     SELECT id, password
@@ -157,7 +157,7 @@ const createNewUser = async({ username, password }) => {
     throw error;
   }; 
 
-  const user = await createUser({ username, password });
+  const user = await createUser({ username, password, name, email, photoURL });
 
   const token = await jwt.sign({id:user.id}, JWT);
   console.log(token);
@@ -204,11 +204,24 @@ const fetchCourts = async()=> {
   return response.rows;
 };
 
+const fetchCourtById = async(id) => {
+
+  const SQL = `
+  SELECT * FROM courts
+  WHERE id = $1
+  `;
+
+  const response = await client.query(SQL, [id])
+
+  return response.rows[0];
+}
+
 const fetchFavoriteCourts = async(user_id)=> {
   const SQL = `
-    SELECT *
+    SELECT courts.*, favorite_courts.id as fav_id 
     FROM favorite_courts
-    WHERE user_id = $1
+    JOIN courts ON favorite_courts.court_id = courts.id
+    WHERE favorite_courts.user_id = $1
   `;
   const response = await client.query(SQL, [ user_id ]);
   return response.rows;
@@ -216,9 +229,10 @@ const fetchFavoriteCourts = async(user_id)=> {
 
 const fetchScheduledEvents = async(user_id)=> {
   const SQL = `
-    SELECT *
+    SELECT scheduled_events.*, courts.name as court_name, courts.photoURL as court_photo, courts.neighborhood as court_neighborhood
     FROM scheduled_events
-    WHERE user_id = $1
+    JOIN courts ON scheduled_events.court_id = courts.id
+    WHERE scheduled_events.user_id = $1
   `;
   const response = await client.query(SQL, [ user_id ]);
   return response.rows;
@@ -252,6 +266,7 @@ const findUserByToken = async(token) => {
   try{
     const payload = await jwt.verify(token, JWT);
     id = payload.id;
+    console.log('Decoded Token Payload:', payload); 
 
   } catch(ex){
     const error = Error('not authorized');
@@ -260,7 +275,7 @@ const findUserByToken = async(token) => {
     
   }
   const SQL = `
-    SELECT id, username
+    SELECT id, username, name, photourl
     FROM users
     WHERE id = $1
   `;
@@ -290,6 +305,7 @@ module.exports = {
   fetchCities,
   fetchSports,
   fetchCourts,
+  fetchCourtById,
   fetchScheduledEvents,
   deleteFavoriteCourts,
   deleteScheduledEvents,

@@ -13,6 +13,7 @@ const {
   fetchCities,
   fetchSports,
   fetchCourts,
+  fetchCourtById,
   fetchScheduledEvents,
   fetchFavoriteCourts,
   deleteFavoriteCourts,
@@ -24,6 +25,7 @@ const {
 const express = require('express');
 const app = express();
 app.use(express.json());
+const cors = require('cors');
 
 //For deployment only
 
@@ -37,12 +39,29 @@ const isLoggedIn = async(req,res,next) => {
 
   try{
 
-    req.user = await findUserByToken(req.headers.authorization);
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
+    if (!token) {
+      const error = Error('Token missing');
+      error.status = 401;
+      throw error;
+    };
+
+
+    console.log('Authorization Header:', req.headers.authorization); 
+    console.log('Token Extracted:', token);
+
+    req.user = await findUserByToken(token);
     next();
 
   } catch(error){next(error)};
 
-}
+};
+
+// Create the middleware for Cross-Origin Resource Sharing
+
+app.use(cors()); 
+app.use(express.json());
 
 // API routes here
 
@@ -109,13 +128,30 @@ app.get('/api/courts', async(req, res, next)=> {
   }
 });
 
-app.get('/api/users/:id/favCourts',/* isLoggedIn,*/ async(req, res, next)=> {
+app.get('/api/courts/:id', isLoggedIn, async (req, res, next) => {
   try {
-    // if(req.params.id !== req.user.id){
-    //   const error = Error('not authorized');
-    //   error.Status = 401;
-    //   throw error;
-    // }
+    const courtId = req.params.id;
+    const court = await fetchCourtById(courtId);
+    
+    if (!court) {
+      const error = new Error('Court not found');
+      error.status = 404;
+      throw error;
+    }
+
+    res.send(court);
+  } catch (ex) {
+    next(ex);
+  }
+});
+
+app.get('/api/users/:id/favCourts', isLoggedIn, async(req, res, next)=> {
+  try {
+    if(req.params.id !== req.user.id){
+      const error = Error('not authorized');
+      error.Status = 401;
+      throw error;
+    }
     res.send(await fetchFavoriteCourts(req.params.id));
   }
   catch(ex){
@@ -123,13 +159,13 @@ app.get('/api/users/:id/favCourts',/* isLoggedIn,*/ async(req, res, next)=> {
   }
 });
 
-app.get('/api/users/:id/schedEvents',/* isLoggedIn,*/ async(req, res, next)=> {
+app.get('/api/users/:id/schedEvents', isLoggedIn, async(req, res, next)=> {
   try {
-    // if(req.params.id !== req.user.id){
-    //   const error = Error('not authorized');
-    //   error.Status = 401;
-    //   throw error;
-    // }
+    if(req.params.id !== req.user.id){
+      const error = Error('not authorized');
+      error.Status = 401;
+      throw error;
+    }
     res.send(await fetchScheduledEvents(req.params.id));
   }
   catch(ex){
@@ -137,13 +173,13 @@ app.get('/api/users/:id/schedEvents',/* isLoggedIn,*/ async(req, res, next)=> {
   }
 });
 
-app.delete('/api/users/:userId/favCourts/:id',/* isLoggedIn,*/ async(req, res, next)=> {
+app.delete('/api/users/:userId/favCourts/:id', isLoggedIn, async(req, res, next)=> {
   try {
-    // if(req.params.userId !== req.user.id){
-    //   const error = Error('not authorized');
-    //   error.status = 401;
-    //   throw error;
-    // }
+    if(req.params.userId !== req.user.id){
+      const error = Error('not authorized');
+      error.status = 401;
+      throw error;
+    }
     await deleteFavoriteCourts({ user_id: req.params.userId, id: req.params.id });
     res.sendStatus(204);
   }
@@ -152,13 +188,13 @@ app.delete('/api/users/:userId/favCourts/:id',/* isLoggedIn,*/ async(req, res, n
   }
 });
 
-app.delete('/api/users/:userId/schedEvents/:id',/* isLoggedIn,*/ async(req, res, next)=> {
+app.delete('/api/users/:userId/schedEvents/:id',isLoggedIn, async(req, res, next)=> {
   try {
-    // if(req.params.userId !== req.user.id){
-    //   const error = Error('not authorized');
-    //   error.status = 401;
-    //   throw error;
-    // }
+    if(req.params.userId !== req.user.id){
+      const error = Error('not authorized');
+      error.status = 401;
+      throw error;
+    }
     await deleteScheduledEvents({ user_id: req.params.userId, id: req.params.id });
     res.sendStatus(204);
   }
@@ -167,33 +203,94 @@ app.delete('/api/users/:userId/schedEvents/:id',/* isLoggedIn,*/ async(req, res,
   }
 });
 
-app.post('/api/users/:id/favCourts', /* isLoggedIn,*/ async(req, res, next)=> {
+app.post('/api/users/:id/favCourts', isLoggedIn, async (req, res, next) => {
   try {
-    // if(req.params.id !== req.user.id){
-    //   const error = Error('not authorized');
-    //   error.status = 401;
-    //   throw error;
-    // }
-    res.status(201).send(await createFavoriteCourts({user_id: req.body.user_id, court_id: req.body.court_id}));
-  }
-  catch(ex){
+    // Ensure the logged-in user matches the user ID in the request URL
+    if (req.params.id !== req.user.id) {
+      const error = Error('Not authorized');
+      error.status = 401;
+      throw error;
+    }
+
+    // Use req.user.id instead of req.body.user_id because it's authenticated
+    const { court_id } = req.body;
+
+    // Ensure court_id is provided in the request body
+    if (!court_id) {
+      const error = new Error('Missing court_id');
+      error.status = 400;
+      throw error;
+    }
+
+    // Create the favorite court entry
+    const favoriteCourt = await createFavoriteCourts({ user_id: req.user.id, court_id });
+    res.status(201).send(favoriteCourt);
+  } catch (ex) {
     next(ex);
   }
 });
 
-app.post('/api/users/:id/schedEvents', /* isLoggedIn,*/ async(req, res, next)=> {
+app.post('/api/users/:userId/schedEvents', isLoggedIn, async (req, res, next) => {
   try {
-    // if(req.params.id !== req.user.id){
-    //   const error = Error('not authorized');
-    //   error.status = 401;
-    //   throw error;
-    // }
-    res.status(201).send(await createScheduledEvents({dateTime: req.body.dateTime, user_id: req.params.id, court_id_id: req.body.court_id}));
-  }
-  catch(ex){
+    // Ensure the logged-in user is the same as the user in the URL
+    if (String(req.params.userId) !== req.user.id) {
+      const error = new Error('Not authorized');
+      error.status = 401;
+      throw error;
+    };
+
+    // Get dateTime and court_id from request body
+    const { dateTime, court_id } = req.body;
+
+    if (!dateTime || !court_id) {
+      const error = new Error('Missing dateTime or court_id');
+      error.status = 400;
+      throw error;
+    }
+
+    // Create the scheduled event
+    const scheduledEvent = await createScheduledEvents({
+      dateTime,
+      user_id: req.user.id, // Use the user ID from the URL
+      court_id
+    });
+
+    res.status(201).send(scheduledEvent);
+  } catch (ex) {
     next(ex);
   }
 });
+
+app.patch('/api/courts/:id', isLoggedIn, async(req,res,next) => {
+  try{
+    const courtId = req.params.id;
+    const{rating, review} = req.body;
+
+    if (rating == null || !review) {
+      const error = new Error('Rating and review are required');
+      error.status = 400;
+      throw error
+    };
+
+    const SQL = `
+    UPDATE courts
+    SET rating=$1, review=$2
+    WHERE id=$3
+    RETURNING *
+    `;
+
+    const response = await client.query(SQL, [rating, review, courtId]);
+
+    if(response.rows.lenght === 0) {
+      const error = new Error('Court not found');
+      error.status = 404;
+      throw error;
+    };
+
+    res.status(200).send(response.rows[0]);
+
+  } catch(error){next(error)}
+})
 
 app.use((err, req, res, next)=> {
   console.log(err);

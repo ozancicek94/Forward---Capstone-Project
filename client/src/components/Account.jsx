@@ -1,0 +1,184 @@
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../assets/ForwardLogo.svg';
+import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
+import schedEventsIcon from '../assets/schedEventsIcon.svg';
+
+export default function Account() {
+  const [user, setUser] = useState(null); // Start as null until fetched
+  const [scheduledEvents, setScheduledEvents] = useState([]);
+  const [favoriteCourts, setFavoriteCourts] = useState([]);
+  const [eventsDeleted, setEventsDeleted] = useState(false);
+  const [favCourtDeleted, setFavCourtDeleted] = useState(false);
+  const navigate = useNavigate();
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+
+      try {
+        // Fetch user data
+        const userResponse = await fetch(`http://localhost:3000/api/auth/me`,{
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const userData = await userResponse.json();
+        setUser(userData);
+
+        // Fetch user's scheduled events after user data is fetched
+        const eventsResponse = await fetch(
+          `http://localhost:3000/api/users/${userData.id}/schedEvents`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        );
+        const eventsData = await eventsResponse.json();
+        setScheduledEvents(eventsData);
+
+        // Fetch user's favorite courts
+        const favCourtsResponse = await fetch(
+          `http://localhost:3000/api/users/${userData.id}/favCourts`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        );
+        const favCourtsData = await favCourtsResponse.json();
+        setFavoriteCourts(favCourtsData);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [eventsDeleted, favCourtDeleted]); // Re-fetch if events are deleted
+
+  console.log("sched events are here", scheduledEvents);
+  console.log("user is here", user);
+
+  const handleDelete = async (eventID) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/users/${user.id}/schedEvents/${eventID}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setFavCourtDeleted(!favCourtDeleted); // Toggle state to re-fetch events
+      } else {
+        console.error("Error deleting event");
+      }
+    } catch (error) {
+      console.error("Error in deletion:", error);
+    }
+  };
+
+  const handleFavDelete = async (favCourtId) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/users/${user.id}/favCourts/${favCourtId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setFavCourtDeleted(!favCourtDeleted); // Toggle state to re-fetch events
+      } else {
+        console.error("Error deleting favorite court");
+      }
+    } catch (error) {
+      console.error("Error in deletion:", error);
+    }
+  };
+
+  // Conditionally render user and events
+  if (!user) {
+    return <p>Loading user data...</p>;
+  }
+
+  return (
+    <div>
+      <img className="bigCityImage" src={`public/assets/AccountPagePhoto.jpg`} alt="City Image" />
+      <img onClick={() => {navigate(`/Courts`)}} className="topLogo" src={topLogo} alt="Logo" />
+      <img className="leftLogo" src={logo} alt="Logo" />
+    <div className="courtList">
+    <div className="accountPage">
+  <div className="leftContent">
+    <h1>{user.name}'s Account</h1>
+    <div className="favCourts">
+    <h2>Favorite Courts</h2>
+    {favoriteCourts.length === 0 ? (
+      <p>No favorite courts.</p>
+    ) : (
+      <ul>
+        {favoriteCourts.map((court) => (
+          <li key={court.fav_id}>
+            <h3>{court.name}</h3>
+            <img src={court.photourl} alt={court.name} style={{ width: '200px', height: 'auto' }} />
+            <p>{court.neighborhood}</p>
+            <Link to={`/Courts/${court.id}`}>
+              <button>See Details</button>
+            </Link>
+            <button className="favCourtRemoveButton" type="button" onClick={() => handleFavDelete(court.fav_id)}>
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+    </div>
+  </div>
+
+  <div className="rightContent">
+    <img className="profilePhoto" src={user.photourl} alt={user.name} />
+    <div className="schedEvents">
+    <img className="schedEventsIcon" src={schedEventsIcon} alt="Logo" />
+    <h2>Scheduled Events</h2>
+    {scheduledEvents.length === 0 ? (
+      <p>No scheduled events.</p>
+    ) : (
+      <ul>
+        {scheduledEvents.map((event) => (
+          <li key={event.id}>
+            <h2>{event.court_name}</h2>
+            <p>{event.court_neighborhood}</p>
+            <img src={event.court_photo} alt={event.court_name} style={{ width: '200px', height: 'auto' }} />
+            <p>{event.datetime}</p>
+            <button type="button" onClick={() => handleDelete(event.id)}>
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+    </div>
+  </div>
+</div>
+    </div>
+    </div>
+  );
+}
