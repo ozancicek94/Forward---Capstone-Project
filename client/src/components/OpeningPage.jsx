@@ -4,7 +4,6 @@ import openingLogo from '../assets/OpeningLogo.svg';
 import cityLogo from '../assets/WorldIcon.svg';  // Example logo for "City"
 import sportLogo from '../assets/BasketBallBigIcon.svg'; // Example logo for "Sport"
 
-
 // The opening logo component with animation
 const OpeningPage = ({ onAnimationEnd }) => {
   const [animate, setAnimate] = useState(false);
@@ -91,7 +90,13 @@ const OpeningPageApp = () => {
   };
 
   return (
-    <div className="App">
+    <div
+      className="App"
+      style={{
+        backgroundColor: 'white',  // Ensure the background stays white for the opening and homepage
+        minHeight: '100vh',  // Ensure it covers the full height of the viewport
+      }}
+    >
       {!showHomePage && <OpeningPage onAnimationEnd={handleAnimationEnd} />}
       {showHomePage && (
         <div className={`home-page ${homePageVisible ? 'fade-in' : ''}`}>

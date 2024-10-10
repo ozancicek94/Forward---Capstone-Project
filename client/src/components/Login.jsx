@@ -24,7 +24,9 @@ export default function Login () {
       });
       const response = await request.json();
       if(response.token) {localStorage.setItem("token", response.token);
-      navigate("/")} else {
+      navigate("/courts");
+      window.location.reload(); }
+      else {
         setError("Incorrect credentials!");
         setUsername("");
         setPassword("");
