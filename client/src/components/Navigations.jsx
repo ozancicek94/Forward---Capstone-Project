@@ -3,8 +3,8 @@ import myProfileLogo from '../assets/MyProfileLogo.svg';
 import findCourtsLogo from '../assets/FindCourtsLogo.svg';
 import { useState, useEffect } from 'react';
 
-export default function Navigations() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function Navigations({isLoggedIn, setIsLoggedIn}) {
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");

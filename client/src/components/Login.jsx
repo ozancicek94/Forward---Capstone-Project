@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
 
-export default function Login () {
+export default function Login ({setIsLoggedIn}) {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,9 @@ export default function Login () {
       const response = await request.json();
       if(response.token) {localStorage.setItem("token", response.token);
       navigate("/courts");
-      window.location.reload(); }
+      setIsLoggedIn(true);
+      // window.location.reload();
+       }
       else {
         setError("Incorrect credentials!");
         setUsername("");

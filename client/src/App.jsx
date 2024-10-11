@@ -11,18 +11,19 @@ import OpeningPageApp from './components/OpeningPage';
 
 function AppContent() {
   const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Check if we are on the opening page
   const isOpeningPage = location.pathname === '/';
 
   return (
     <div className={isOpeningPage ? 'opening-page' : 'blue-page'}>
-      <Navigations />
+      <Navigations isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
       <Routes>
         <Route path='/' element={<OpeningPageApp />} />
         <Route path='/Courts' element={<Courts />} />
         <Route path='/courts/:id' element={<SingleCourt />} />
-        <Route path='/LogIn' element={<Login />} />
+        <Route path='/LogIn' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path='/Register' element={<Register />} />
         <Route path='/Account' element={<Account />} />
       </Routes>
