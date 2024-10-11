@@ -52,7 +52,7 @@ const OpeningPageApp = () => {
   // Fetch cities from backend API
   const fetchCities = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/cities');
+      const response = await fetch('https://forward-capstone-project.onrender.com/api/cities');
       const data = await response.json();
       console.log('Fetched Cities:', data);
       setCities(data);
@@ -64,7 +64,7 @@ const OpeningPageApp = () => {
   // Fetch sports from backend API
   const fetchSports = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/sports');
+      const response = await fetch('https://forward-capstone-project.onrender.com/api/sports');
       const data = await response.json();
       console.log('Fetched Sports:', data);
       setSports(data);

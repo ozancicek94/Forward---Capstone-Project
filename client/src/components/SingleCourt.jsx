@@ -25,7 +25,7 @@ export default function SingleCourt () {
         const token = localStorage.getItem("token"); 
         console.log("Token is here", token);
 
-        const request = await fetch(`http://localhost:3000/api/courts/${id}`, {
+        const request = await fetch(`https://forward-capstone-project.onrender.com/api/courts/${id}`, {
           headers:{
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ export default function SingleCourt () {
         setReview(response.review || '');
 
         // Fetch the user's favorite courts
-        const userRequest = await fetch("http://localhost:3000/api/auth/me", {
+        const userRequest = await fetch("https://forward-capstone-project.onrender.com/api/auth/me", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ export default function SingleCourt () {
         const userData = await userRequest.json();
 
         const favCourtsResponse = await fetch(
-          `http://localhost:3000/api/users/${userData.id}/favCourts`,
+          `https://forward-capstone-project.onrender.com/api/users/${userData.id}/favCourts`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export default function SingleCourt () {
 
     try{
 
-      const userRequest = await fetch('http://localhost:3000/api/auth/me', {
+      const userRequest = await fetch('https://forward-capstone-project.onrender.com/api/auth/me', {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,  // Send the token in the header
@@ -104,7 +104,7 @@ export default function SingleCourt () {
       const userId = userData.id;
       console.log("User for schedevent is here", userData);
 
-      const request = await fetch(`http://localhost:3000/api/users/${userId}/schedEvents`, {
+      const request = await fetch(`https://forward-capstone-project.onrender.com/api/users/${userId}/schedEvents`, {
         method:"POST",
         headers:{
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ export default function SingleCourt () {
     }
 
     try{
-      const request = await fetch(`http://localhost:3000/api/courts/${court.id}`, {
+      const request = await fetch(`https://forward-capstone-project.onrender.com/api/courts/${court.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -177,7 +177,7 @@ export default function SingleCourt () {
     }
 
     try {
-      const userRequest = await fetch("http://localhost:3000/api/auth/me", {
+      const userRequest = await fetch("https://forward-capstone-project.onrender.com/api/auth/me", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -191,7 +191,7 @@ export default function SingleCourt () {
       const userData = await userRequest.json();
       const userId = userData.id;
 
-      const response = await fetch(`http://localhost:3000/api/users/${userId}/favCourts`, {
+      const response = await fetch(`https://forward-capstone-project.onrender.com/api/users/${userId}/favCourts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

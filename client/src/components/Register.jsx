@@ -17,7 +17,7 @@ export default function Register () {
     e.preventDefault();
 
     try{
-      const request = await fetch(`http://localhost:3000/api/auth/register`, {
+      const request = await fetch(`https://forward-capstone-project.onrender.com/api/auth/register`, {
         method:"POST",
         headers:{
           "Content-Type":"application/json",

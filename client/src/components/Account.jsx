@@ -19,7 +19,7 @@ export default function Account() {
 
       try {
         // Fetch user data
-        const userResponse = await fetch(`http://localhost:3000/api/auth/me`,{
+        const userResponse = await fetch(`https://forward-capstone-project.onrender.com/api/auth/me`,{
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -30,7 +30,7 @@ export default function Account() {
 
         // Fetch user's scheduled events after user data is fetched
         const eventsResponse = await fetch(
-          `http://localhost:3000/api/users/${userData.id}/schedEvents`,
+          `https://forward-capstone-project.onrender.com/api/users/${userData.id}/schedEvents`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export default function Account() {
 
         // Fetch user's favorite courts
         const favCourtsResponse = await fetch(
-          `http://localhost:3000/api/users/${userData.id}/favCourts`,
+          `https://forward-capstone-project.onrender.com/api/users/${userData.id}/favCourts`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function Account() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/users/${user.id}/schedEvents/${eventID}`,
+        `https://forward-capstone-project.onrender.com/api/users/${user.id}/schedEvents/${eventID}`,
         {
           method: "DELETE",
           headers: {
@@ -95,7 +95,7 @@ export default function Account() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/users/${user.id}/favCourts/${favCourtId}`,
+        `https://forward-capstone-project.onrender.com/api/users/${user.id}/favCourts/${favCourtId}`,
         {
           method: "DELETE",
           headers: {

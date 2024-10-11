@@ -16,7 +16,7 @@ export default function Login () {
     e.preventDefault();
 
     try{
-      const request = await fetch(`http://localhost:3000/api/auth/login`,{
+      const request = await fetch(`https://forward-capstone-project.onrender.com/api/auth/login`,{
         method:"POST",
         headers:{
           "Content-Type": "application/json",

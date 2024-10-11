@@ -15,7 +15,7 @@ export default function Courts() {
   useEffect(() => {
     const fetchAllCourts = async () => {
       try {
-        const request = await fetch("http://localhost:3000/api/courts");
+        const request = await fetch("https://forward-capstone-project.onrender.com/api/courts");
         const response = await request.json();
         console.log("Courts are here!", response);
         setCourts(response);
@@ -58,7 +58,7 @@ export default function Courts() {
   return (
     <div className="blue-page">
       <img onClick={() => { navigate(`/`) }} className="topLogo" src={topLogo} alt="Logo" />
-      <img className="bigCityImage" src={`public/assets/bigNYImage_02.jpg`} alt="City Image" />
+      <img className="bigCityImage" src={`../assets/bigNYImage_02.jpg`} alt="City Image" />
       <img className="leftLogo" src={logo} alt="Logo" />
       <div className="courtList">
         <img className="BasketballIcon" src={basketballLogo} alt="Logo" />
