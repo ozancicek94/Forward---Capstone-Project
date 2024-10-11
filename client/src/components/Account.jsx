@@ -8,9 +8,11 @@ import accountPagePhoto from '../assets/AccountPagePhoto.jpg';
 export default function Account() {
   const [user, setUser] = useState(null); // Start as null until fetched
   const [scheduledEvents, setScheduledEvents] = useState([]);
+  const [userReviews, setUserReviews] = useState([]);
   const [favoriteCourts, setFavoriteCourts] = useState([]);
   const [eventsDeleted, setEventsDeleted] = useState(false);
   const [favCourtDeleted, setFavCourtDeleted] = useState(false);
+  const [reviewDeleted, setReviewDeleted] = useState(false);
   const navigate = useNavigate();
   
 
@@ -55,13 +57,26 @@ export default function Account() {
         const favCourtsData = await favCourtsResponse.json();
         setFavoriteCourts(favCourtsData);
 
+        // Fetch user's reviews after user data is fetched
+        const reviewsResponse= await fetch(
+          `https://forward-capstone-project.onrender.com/api/users/${userData.id}/userReviews`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        );
+        const reviewsData = await reviewsResponse.json();
+        setUserReviews(eventsData);
+
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching review data:", error);
       }
     };
 
     fetchData();
-  }, [eventsDeleted, favCourtDeleted]); // Re-fetch if events are deleted
+  }, [eventsDeleted, favCourtDeleted, reviewDeleted]); // Re-fetch if events are deleted
 
   console.log("sched events are here", scheduledEvents);
   console.log("user is here", user);
@@ -85,6 +100,31 @@ export default function Account() {
         setFavCourtDeleted(!favCourtDeleted); // Toggle state to re-fetch events
       } else {
         console.error("Error deleting event");
+      }
+    } catch (error) {
+      console.error("Error in deletion:", error);
+    }
+  };
+
+  const handleReviewDelete = async (reviewID) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `https://forward-capstone-project.onrender.com/api/users/${user.id}/userReviews/${eventID}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setReviewDeleted(!reviewDeleted); // Toggle state to re-fetch events
+      } else {
+        console.error("Error deleting review");
       }
     } catch (error) {
       console.error("Error in deletion:", error);
@@ -145,6 +185,30 @@ export default function Account() {
               <button>See Details</button>
             </Link>
             <button className="favCourtRemoveButton" type="button" onClick={() => handleFavDelete(court.fav_id)}>
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+    </div>
+
+    <div className="userReviews">
+    <h2>User's Reviews</h2>
+    {userReviews.length === 0 ? (
+      <p>No reviews yet.</p>
+    ) : (
+      <ul>
+        {userReviews.map((review) => (
+          <li key={review.id}>
+            <h3>{review.court_name}</h3>
+            <img src={review.court_photo} alt={court.name} style={{ width: '3em', height: 'auto' }} />
+            <p>{review.review}</p>
+            <p>{review.rating}</p>
+            <Link to={`/Courts/${review.court_id}`}>
+              <button>See Details</button>
+            </Link>
+            <button className="favCourtRemoveButton" type="button" onClick={() => handleReviewDelete(review.id)}>
               Remove
             </button>
           </li>

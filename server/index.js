@@ -9,6 +9,7 @@ const {
   createFavoriteCourts,
   createSport,
   createScheduledEvents,
+  createReview,
   fetchUsers,
   fetchCities,
   fetchSports,
@@ -16,6 +17,7 @@ const {
   fetchCourtById,
   fetchScheduledEvents,
   fetchFavoriteCourts,
+  fetchUserReviews,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   authenticate,
@@ -167,6 +169,20 @@ app.get('/api/users/:id/schedEvents', isLoggedIn, async(req, res, next)=> {
       throw error;
     }
     res.send(await fetchScheduledEvents(req.params.id));
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
+app.get('/api/users/:id/userReviews', isLoggedIn, async(req, res, next)=> {
+  try {
+    if(req.params.id !== req.user.id){
+      const error = Error('not authorized');
+      error.Status = 401;
+      throw error;
+    }
+    res.send(await fetchUserReviews(req.params.id));
   }
   catch(ex){
     next(ex);
@@ -354,6 +370,19 @@ const init = async()=> {
     createScheduledEvents({ dateTime: '10.25.2024 @ 5:00 pm', user_id: Ozan.id, court_id: ChelseaPiers.id}),
     createScheduledEvents({ dateTime: '10.17.2024 @ 4:00 pm', user_id: Mariana.id, court_id: ChelseaPiers.id}),
     createScheduledEvents({ dateTime: '10.12.2024 @ 7:00 pm', user_id: Sevki.id, court_id: ChelseaPiers.id})
+    
+  ]);
+
+  const reviewsSeedData = await Promise.all([
+
+    createReview({ review: 'Great court but the people are toxic', rating: 4, user_id: Ozan.id, court_id: ChelseaPiers.id}),
+    createReview({ review: 'Great views but it is too windy and the ball flies in the air', rating: 3, user_id: Ozan.id, court_id: CanalStreet.id}),
+    createReview({ review: 'The hoop is good but they close the park too early', rating: 2, user_id: Ozan.id, court_id: Gertrude.id}),
+    createReview({ review: 'I do not even like basketball', rating: 2, user_id: Mariana.id, court_id: ChelseaPiers.id}),
+    createReview({ review: 'At least the view is nice here while Ozan is playing', rating: 4, user_id: Mariana.id, court_id: CanalStreet.id}),
+    createReview({ review: 'Basketball is such a lame sport, where is the boxing gym', rating: 1, user_id: Sevki.id, court_id: Corporal.id}),
+    createReview({ review: 'This place is great, but I do not like basketball', rating: 2, user_id: Sevki.id, court_id: ChelseaPiers.id}),
+    
     
   ]);
 

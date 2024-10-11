@@ -14,6 +14,7 @@ const createTables = async()=> {
 
     DROP TABLE IF EXISTS scheduled_events CASCADE;
     DROP TABLE IF EXISTS favorite_courts CASCADE;
+    DROP TABLE IF EXISTS reviews CASCADE;
     DROP TABLE IF EXISTS users CASCADE;
     DROP TABLE IF EXISTS cities CASCADE;
     DROP TABLE IF EXISTS sports CASCADE;
@@ -61,6 +62,15 @@ const createTables = async()=> {
      CREATE TABLE scheduled_events(
       id UUID PRIMARY KEY,
       dateTime VARCHAR(1000) NOT NULL,
+      user_id UUID REFERENCES users(id) NOT NULL,
+      court_id UUID REFERENCES courts(id) NOT NULL
+      
+    );
+
+    CREATE TABLE reviews(
+      id UUID PRIMARY KEY,
+      review VARCHAR(10000) NOT NULL,
+      rating integer NOT NULL,
       user_id UUID REFERENCES users(id) NOT NULL,
       court_id UUID REFERENCES courts(id) NOT NULL
       
@@ -117,6 +127,14 @@ const createScheduledEvents = async({ dateTime, user_id, court_id })=> {
     INSERT INTO scheduled_events(id, dateTime, user_id, court_id) VALUES ($1, $2, $3, $4) RETURNING * 
   `;
   const response = await client.query(SQL, [ uuid.v4(), dateTime, user_id, court_id]);
+  return response.rows[0];
+};
+
+const createReview = async({ review, rating, user_id, court_id })=> {
+  const SQL = `
+    INSERT INTO reviews(id, review, rating, user_id, court_id) VALUES ($1, $2, $3, $4, $5) RETURNING * 
+  `;
+  const response = await client.query(SQL, [ uuid.v4(), review, rating, user_id, court_id]);
   return response.rows[0];
 };
 
@@ -238,6 +256,17 @@ const fetchScheduledEvents = async(user_id)=> {
   return response.rows;
 };
 
+const fetchUserReviews = async(user_id)=> {
+  const SQL = `
+    SELECT reviews.*, courts.name as court_name, courts.photoURL as court_photo, courts.neighborhood as court_neighborhood
+    FROM reviews
+    JOIN courts ON reviews.court_id = courts.id
+    WHERE reviews.user_id = $1
+  `;
+  const response = await client.query(SQL, [ user_id ]);
+  return response.rows;
+};
+
 // Create methods to delete Favorite Courts and Scheduled Events
 
 const deleteFavoriteCourts = async({user_id, id})=> {
@@ -300,6 +329,7 @@ module.exports = {
   createFavoriteCourts,
   createSport,
   createScheduledEvents,
+  createReview,
   fetchFavoriteCourts,
   fetchUsers,
   fetchCities,
@@ -307,6 +337,7 @@ module.exports = {
   fetchCourts,
   fetchCourtById,
   fetchScheduledEvents,
+  fetchUserReviews,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   authenticate,
