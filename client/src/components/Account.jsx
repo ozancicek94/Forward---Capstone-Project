@@ -68,7 +68,7 @@ export default function Account() {
           }
         );
         const reviewsData = await reviewsResponse.json();
-        setUserReviews(eventsData);
+        setUserReviews(reviewsData);
 
       } catch (error) {
         console.error("Error fetching review data:", error);
@@ -111,7 +111,7 @@ export default function Account() {
 
     try {
       const response = await fetch(
-        `https://forward-capstone-project.onrender.com/api/users/${user.id}/userReviews/${eventID}`,
+        `https://forward-capstone-project.onrender.com/api/users/${user.id}/userReviews/${reviewID}`,
         {
           method: "DELETE",
           headers: {
@@ -202,7 +202,7 @@ export default function Account() {
         {userReviews.map((review) => (
           <li key={review.id}>
             <h3>{review.court_name}</h3>
-            <img src={review.court_photo} alt={court.name} style={{ width: '3em', height: 'auto' }} />
+            <img src={review.court_photo} alt={review.court_name} style={{ width: '3em', height: 'auto' }} />
             <p>{review.review}</p>
             <p>{review.rating}</p>
             <Link to={`/Courts/${review.court_id}`}>
