@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
 import schedEventsIcon from '../assets/schedEventsIcon.svg';
+import accountPagePhoto from '../assets/AccountPagePhoto.jpg';
 
 export default function Account() {
   const [user, setUser] = useState(null); // Start as null until fetched
@@ -122,7 +123,7 @@ export default function Account() {
 
   return (
     <div>
-      <img className="bigCityImage" src={`public/assets/AccountPagePhoto.jpg`} alt="City Image" />
+      <img className="bigCityImage" src={accountPagePhoto} alt="City Image" />
       <img onClick={() => {navigate(`/Courts`)}} className="topLogo" src={topLogo} alt="Logo" />
       <img className="leftLogo" src={logo} alt="Logo" />
     <div className="courtList">

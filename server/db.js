@@ -1,7 +1,7 @@
 // Import packages here
 
 const pg = require('pg');
-const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/forward_db');
+const client = new pg.Client(process.env.DATABASE_URL || 'postgresql://forward_database_user:TdcVnCXdaglBWZzoeUBqr6KRFwjWCLkC@dpg-cs47nmtsvqrc7386u9g0-a.ohio-postgres.render.com/forward_database?ssl=true');
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');

@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
+import venicePhoto from '../assets/Venice.jpg';
 
 export default function Login ({setIsLoggedIn}) {
 
@@ -40,7 +41,7 @@ export default function Login ({setIsLoggedIn}) {
   return (
     <div>
       <img onClick={() => {navigate(`/Courts`)}} className="topLogo" src={topLogo} alt="Logo" />
-      <img className="bigCityImage" src={`public/assets/Venice.jpg`} alt="City Image" />
+      <img className="bigCityImage" src={venicePhoto} alt="City Image" />
       <img className="leftLogo" src={logo} alt="Logo" />
     <div className="courtList">
       {error && <p>{error}</p>}

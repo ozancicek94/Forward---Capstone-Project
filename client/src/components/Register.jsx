@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
+import Brooklyn_05 from '../assets/Brooklyn_05.png';
 
 export default function Register () {
 
@@ -37,7 +38,7 @@ export default function Register () {
   return (
     <div>
       <img onClick={() => {navigate(`/Courts`)}} className="topLogo" src={topLogo} alt="Logo" />
-      <img className="bigCityImage" src={`public/assets/Brooklyn_05.png`} alt="City Image" />
+      <img className="bigCityImage" src={Brooklyn_05} alt="City Image" />
       <img className="leftLogo" src={logo} alt="Logo" />
     <div className="courtList">
     <form className="content" onSubmit={handleRegister}>

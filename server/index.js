@@ -26,12 +26,12 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 const cors = require('cors');
-
+// app.use(cors())
 //For deployment only
 
 const path = require('path');
-app.get('/', (req, res)=> res.sendFile(path.join(__dirname, '../client/dist/index.html')));
-app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets'))); 
+// app.get('/', (req, res)=> res.sendFile(path.join(__dirname, '../client/dist/index.html')));
+// app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets'))); 
 
 // Create the middleware function called isLoggedIn
 
@@ -60,8 +60,8 @@ const isLoggedIn = async(req,res,next) => {
 
 // Create the middleware for Cross-Origin Resource Sharing
 
-app.use(cors()); 
-app.use(express.json());
+// app.use(cors()); 
+// app.use(express.json());
 
 // API routes here
 
