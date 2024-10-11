@@ -67,6 +67,8 @@ export default function Account() {
             }
           }
         );
+
+        console.log("Reviews response", reviewsResponse);
         const reviewsData = await reviewsResponse.json();
         setUserReviews(reviewsData);
 
