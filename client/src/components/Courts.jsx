@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
 import basketballLogo from '../assets/BasketballIcon.svg';
+import bigCityImage from '../assets/BigNYImage_02.jpg';
 
 export default function Courts() {
   const [courts, setCourts] = useState([]);
@@ -58,7 +59,7 @@ export default function Courts() {
   return (
     <div className="blue-page">
       <img onClick={() => { navigate(`/`) }} className="topLogo" src={topLogo} alt="Logo" />
-      <img className="bigCityImage" src={`../assets/bigNYImage_02.jpg`} alt="City Image" />
+      <img className="bigCityImage" src={bigCityImage} alt="City Image" />
       <img className="leftLogo" src={logo} alt="Logo" />
       <div className="courtList">
         <img className="BasketballIcon" src={basketballLogo} alt="Logo" />
