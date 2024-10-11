@@ -69,6 +69,8 @@ export default function Account() {
         );
 
         console.log("Reviews response", reviewsResponse);
+        console.log("token here", token);
+        console.log("userData is here", userData);
         const reviewsData = await reviewsResponse.json();
         setUserReviews(reviewsData);
 

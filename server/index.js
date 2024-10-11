@@ -28,6 +28,8 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 const cors = require('cors');
+const cors = require('cors');
+app.use(cors()); 
 // app.use(cors())
 //For deployment only
 
@@ -175,16 +177,22 @@ app.get('/api/users/:id/schedEvents', isLoggedIn, async(req, res, next)=> {
   }
 });
 
-app.get('/api/users/:id/userReviews', isLoggedIn, async(req, res, next)=> {
+app.get('/api/users/:id/userReviews', isLoggedIn, async (req, res, next) => {
   try {
-    if(req.params.id !== req.user.id){
+    console.log(`Fetching reviews for user ID: ${req.params.id}`);
+    console.log(`Authenticated user ID: ${req.user.id}`);
+
+    if (req.params.id !== req.user.id) {
       const error = Error('not authorized');
       error.Status = 401;
       throw error;
     }
-    res.send(await fetchUserReviews(req.params.id));
-  }
-  catch(ex){
+
+    const reviews = await fetchUserReviews(req.params.id);
+    console.log('Fetched reviews:', reviews); // Log the fetched reviews
+
+    res.send(reviews);
+  } catch (ex) {
     next(ex);
   }
 });
