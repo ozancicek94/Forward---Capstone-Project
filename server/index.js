@@ -181,7 +181,6 @@ app.get('/api/users/:id/schedEvents', isLoggedIn, async(req, res, next)=> {
 
 app.get('/api/users/:id/userReviews', isLoggedIn, async (req, res, next) => {
   try {
-    
 
     if (req.params.id !== req.user.id) {
       const error = Error('not authorized');
