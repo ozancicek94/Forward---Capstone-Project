@@ -165,6 +165,9 @@ app.get('/api/users/:id/favCourts', isLoggedIn, async(req, res, next)=> {
 
 app.get('/api/users/:id/schedEvents', isLoggedIn, async(req, res, next)=> {
   try {
+    console.log(`Fetching reviews for user ID: ${req.params.id}`);
+    console.log(`Authenticated user ID: ${req.user.id}`);
+    
     if(req.params.id !== req.user.id){
       const error = Error('not authorized');
       error.Status = 401;
