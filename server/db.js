@@ -267,6 +267,24 @@ const fetchUserReviews = async(user_id)=> {
   return response.rows;
 };
 
+const fetchCourtReviews = async(court_id) => {
+  const SQL = `
+    SELECT 
+      reviews.*, 
+      courts.name AS court_name, 
+      courts.photoURL AS court_photo, 
+      courts.neighborhood AS court_neighborhood, 
+      users.name AS user_name, 
+      users.photoURL AS user_photo
+    FROM reviews
+    JOIN courts ON reviews.court_id = courts.id
+    JOIN users ON reviews.user_id = users.id
+    WHERE reviews.court_id = $1
+  `;
+  const response = await client.query(SQL, [court_id]);
+  return response.rows;
+};
+
 // Create methods to delete Favorite Courts and Scheduled Events
 
 const deleteFavoriteCourts = async({user_id, id})=> {
@@ -285,6 +303,20 @@ const deleteScheduledEvents = async({user_id, id})=> {
     WHERE user_id = $1 AND id = $2
   `;
   await client.query(SQL, [ user_id, id ]);
+};
+
+// Create the calculateAverageRating function:
+
+const calculateAverageRating = async (courtId) => {
+  const result = await client.query(`
+    SELECT AVG(rating) as average_rating
+    FROM reviews
+    WHERE court_id = $1
+  `, [courtId]);
+
+  // Ensure you return a rounded value to 1 decimal place.
+  const averageRating = result.rows[0].average_rating;
+  return Math.round(averageRating * 10) / 10; // Round to one decimal place
 };
 
 // Create the findUserByToken for the isLoggedin middleware function
@@ -338,8 +370,10 @@ module.exports = {
   fetchCourtById,
   fetchScheduledEvents,
   fetchUserReviews,
+  fetchCourtReviews,
   deleteFavoriteCourts,
   deleteScheduledEvents,
+  calculateAverageRating,
   authenticate,
   findUserByToken,
   createNewUser

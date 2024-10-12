@@ -5,10 +5,11 @@ import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
 import basketballLogo from '../assets/BasketballIcon.svg';
 import schedEventsIcon from '../assets/schedEventsIcon.svg';
+import bigCityImage from '../assets/BigNYImage_02.jpg';
 
 export default function SingleCourt () {
 
-  const {id} = useParams();
+  const { id } = useParams();
   const [court, setCourt] = useState(null);
   const [message, setMessage] = useState("");
   const [dateTime, setDateTime] = useState(""); 
@@ -16,6 +17,7 @@ export default function SingleCourt () {
   const [review, setReview] = useState(""); 
   const [favoriteCourts, setFavoriteCourts] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [courtReviews, setCourtReviews] = useState([]);
   const navigate = useNavigate();
 
   useEffect(()=> {
@@ -64,14 +66,94 @@ export default function SingleCourt () {
 
         const favCourtsData = await favCourtsResponse.json();
         setFavoriteCourts(favCourtsData);
+        
 
         // Check if the current court is already in the favorites list
         const isCourtFavorite = favCourtsData.some((favCourt) => favCourt.id === response.id);
-        setIsFavorite(isCourtFavorite);
-      } catch(error) {console.error("Error fetching single court!", error )}
+        setIsFavorite(isCourtFavorite);  
+
+        // Fetch courtReviews
+
+        const courtReviewsResponse = await fetch(
+          `https://forward-capstone-project.onrender.com/api/courts/${court.id}/courtReviews`);
+
+        const courtReviewsData = await courtReviewsResponse.json();
+        setCourtReviews(courtReviewsData);
+
+
+      } catch(error) {console.error("Error fetching court reviews!", error )}
     };
     fetchSingleCourt();
   }, [id]);
+
+  // Second useEffect
+
+  useEffect(() => {
+    if (court && court.id) {
+      const fetchCourtReviews = async () => {
+        try {
+          const courtReviewsResponse = await fetch(
+            `https://forward-capstone-project.onrender.com/api/courts/${court.id}/courtReviews`
+          );
+          const courtReviewsData = await courtReviewsResponse.json();
+          setCourtReviews(courtReviewsData);
+        } catch (error) {
+          console.error("Error fetching court reviews!", error);
+        }
+      };
+  
+      fetchCourtReviews();
+    }
+  }, [court]);
+
+  // handleAddReview Function
+  const handleAddReview = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMessage("Please log in to add a review.");
+      return;
+    }
+
+    if (!review || !rating) {
+      setMessage("Please enter both review and rating.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://forward-capstone-project.onrender.com/api/courts/${id}/reviews`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ review, rating }),
+        }
+      );
+
+      if (response.ok) {
+        // Refetch the updated court reviews after adding the review
+        const updatedReviews = await fetch(
+          `https://forward-capstone-project.onrender.com/api/courts/${id}/courtReviews`
+        );
+        const updatedReviewsData = await updatedReviews.json();
+        setCourtReviews(updatedReviewsData); // Update state with new reviews
+        setMessage("Review added successfully!");
+        setReview(""); // Clear the review input
+        setRating(null); // Clear the rating input
+      } else {
+        const newReview = await response.json();
+        setMessage(newReview.error || "Failed to add review.");
+      }
+    } catch (error) {
+      console.error("Error adding review", error);
+      setMessage("An error occurred while adding your review.");
+    }
+  };
+
+
 
   const handleScheduleEvent = async() => {
     const token = localStorage.getItem("token");
@@ -138,7 +220,7 @@ export default function SingleCourt () {
 
     try{
       const request = await fetch(`https://forward-capstone-project.onrender.com/api/courts/${court.id}`, {
-        method: "PATCH",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization:`Bearer ${token}`
@@ -216,70 +298,89 @@ export default function SingleCourt () {
 
   return (
     <div>
-
-      <img onClick={() => {navigate(`/Courts`)}} className="topLogo" src={topLogo} alt="Logo" />
-      <img className="bigCityImage" src={`/assets/BigNYImage_02.jpg`} alt="City Image" />
+      <img
+        onClick={() => {
+          navigate(`/Courts`);
+        }}
+        className="topLogo"
+        src={topLogo}
+        alt="Logo"
+      />
+      <img className="bigCityImage" src={bigCityImage} alt="City Image" />
       <img className="leftLogo" src={logo} alt="Logo" />
-      <div className="courtList"> 
-      <img className="BasketballIcon" src={basketballLogo} alt="Logo" />
+      <div className="courtList">
+        <img className="BasketballIcon" src={basketballLogo} alt="Logo" />
 
-      <div className="courtContent">
-      <div className="courtLeft">
-      
-      <h2>{court.name}</h2>
-      <img className="singleCourtImage" src={court.photourl}/>
-      <p className="ratingReviewText">Rating: {court.rating}</p>
-      <p>Review: {court.review}</p>
-      <p className="loginLabel">Updating Rating and Review</p>
-      <input className="loginInput"
-      type="number"
-      value={rating}
-      onChange={(e) => {setRating(e.target.value)}}
-      placeholder="Enter new rating"
-      />
-      <textarea
-      className="loginInput"
-      value={review}
-      onChange={(e) => {setReview(e.target.value)}}
-      placeholder="Enter new Rating"
-      />
-      <button onClick={handleUpdate}>Update Rating and Review</button>
+        <div className="courtContent">
+          <div className="courtLeft">
+            <h2>{court.name}</h2>
+            <img className="singleCourtImage" src={court.photourl} alt={court.name} />
 
-      {/* Add to Favorites Button */}
-      {/* Conditionally render the Add to Favorites button */}
-      {!isFavorite && (
-        <button onClick={handleAddToFavorites}>Add to My Favorite Courts</button>
-      )}
+            <p className="ratingReviewText">Rating: {court.rating} / 5</p>
+            <p className="loginLabel">Add Rating and Review</p>
+            <input
+              className="loginInput"
+              type="number"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              placeholder="Enter new rating"
+            />
+            <textarea
+              className="loginInput"
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="Enter new review"
+            />
+            <button onClick={handleAddReview}>Submit Review</button>
 
-      <div className="singleCourtSchedEvent">
+            <div className="courtReviews">
+              <h2>Court Reviews</h2>
 
-      <img className="schedEventsSingleCourt" src={schedEventsIcon} alt="Logo" />
-      
-      <input
-        className="schedEventInput"
-        type="text"
-        value={dateTime}
-        onChange={(e) => setDateTime(e.target.value)}
-        placeholder="Enter event date and time"
-      />
-      <button onClick={handleScheduleEvent}>Schedule Event</button>
+              <ul>
+                {courtReviews.map((review) => (
+                  <li className="reviewItem" key={review.id}>
+                    <img className="courtReviewImages" src={review.user_photo} alt={review.user_name} />
+                    <div className="reviewDetails">
+                      <h2 className="review">{review.review}</h2>
+                      <p>{review.user_name}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
+            {/* Add to Favorites Button */}
+            {!isFavorite && (
+              <button onClick={handleAddToFavorites}>
+                Add to My Favorite Courts
+              </button>
+            )}
+
+            <div className="singleCourtSchedEvent">
+              <img className="schedEventsSingleCourt" src={schedEventsIcon} alt="Logo" />
+              <input
+                className="schedEventInput"
+                type="text"
+                value={dateTime}
+                onChange={(e) => setDateTime(e.target.value)}
+                placeholder="Enter event date and time"
+              />
+              <button onClick={handleScheduleEvent}>Schedule Event</button>
+            </div>
+          </div>
+
+          <div className="courtRight">
+            <p>
+              <a href={court.googlemapslink} target="_blank" rel="noopener noreferrer">
+                View on Google Maps
+              </a>
+            </p>
+            <p>{court.neighborhood}</p>
+            <p>{court.publicorprivate}</p>
+            <p>{court.indoororoutdoor}</p>
+          </div>
+        </div>
       </div>
-     
-      </div>
-      <div className="courtRight">
-      <p>
-        <a href={court.googlemapslink} target="_blank" rel="noopener noreferrer">
-          View on Google Maps
-        </a>
-      </p>
-      <p>{court.neighborhood}</p>
-      <p>{court.publicorprivate}</p>
-      <p>{court.indoororoutdoor}</p>
-      
     </div>
-    </div>
-    </div>
-    </div>
-  )
+  );
 }

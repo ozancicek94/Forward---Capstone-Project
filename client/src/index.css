@@ -443,6 +443,48 @@ select {
   background-color: black;
 }
 
+.courtReviews {
+  margin-top: 20px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.reviewItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.courtReviewImages {
+  width: 2em;  /* Adjust size as needed */
+  height: 2em; /* Adjust size as needed */
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.reviewDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewDetails h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.reviewDetails p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: gray;
+}
+
+/* Add spacing between items */
+.reviewItem:not(:last-child) {
+  margin-bottom: 15px;
+}
 
 
 

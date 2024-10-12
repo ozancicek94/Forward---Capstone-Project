@@ -18,6 +18,7 @@ const {
   fetchScheduledEvents,
   fetchFavoriteCourts,
   fetchUserReviews,
+  fetchCourtReviews,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   authenticate,
@@ -196,6 +197,19 @@ app.get('/api/users/:id/userReviews', isLoggedIn, async (req, res, next) => {
   }
 });
 
+app.get('/api/courts/:id/courtReviews', async (req, res, next) => {
+  try {
+    console.log(`Fetching reviews for court ID: ${req.params.id}`);
+
+    const courtReviews = await fetchCourtReviews(req.params.id);
+    console.log('Fetched court reviews:', courtReviews); // Log the fetched reviews
+
+    res.send(courtReviews);
+  } catch (ex) {
+    next(ex);
+  }
+});
+
 app.delete('/api/users/:userId/favCourts/:id', isLoggedIn, async(req, res, next)=> {
   try {
     if(req.params.userId !== req.user.id){
@@ -281,6 +295,30 @@ app.post('/api/users/:userId/schedEvents', isLoggedIn, async (req, res, next) =>
     res.status(201).send(scheduledEvent);
   } catch (ex) {
     next(ex);
+  }
+});
+
+app.post('/api/courts/:courtId/reviews', isLoggedIn, async (req, res, next) => {
+  try {
+    const { review, rating } = req.body;
+    const { courtId } = req.params;
+    
+    if (!review || rating == null) {
+      const error = new Error('Review and rating are required');
+      error.status = 400;
+      throw error;
+    }
+
+    const newReview = await createReview({
+      review,
+      rating,
+      user_id: req.user.id, // Get the logged-in user's ID from the token
+      court_id: courtId,
+    });
+
+    res.status(201).send(newReview);
+  } catch (error) {
+    next(error);
   }
 });
 
