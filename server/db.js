@@ -259,15 +259,14 @@ const fetchScheduledEvents = async(user_id)=> {
 };
 
 const fetchUserReviews = async(user_id)=> {
-
+  
   const SQL = `
     SELECT reviews.*, courts.name as court_name, courts.photoURL as court_photo, courts.neighborhood as court_neighborhood
     FROM reviews
     JOIN courts ON reviews.court_id = courts.id
     WHERE reviews.user_id = $1
   `;
-  const response = await client.query(SQL);
-  
+  const response = await client.query(SQL, [ user_id ]);
   return response.rows;
 };
 
