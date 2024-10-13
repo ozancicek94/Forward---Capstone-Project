@@ -307,6 +307,26 @@ const fetchCourtReviews = async(court_id) => {
   return response.rows;
 };
 
+const getReviewById = async (reviewId) => {
+  try {
+    const SQL = `
+      SELECT * FROM reviews
+      WHERE id = $1
+    `;
+    const response = await client.query(SQL, [reviewId]);
+
+    // Return the review if found
+    if (response.rows.length === 0) {
+      throw new Error("Review not found");
+    }
+
+    return response.rows[0];
+  } catch (error) {
+    console.error('Error fetching review by ID:', error);
+    throw error;
+  }
+};
+
 const fetchCommentsByReviewId = async (review_id) => {
   const SQL = `
     SELECT comments.*, users.username, users.photourl
@@ -437,6 +457,7 @@ module.exports = {
   fetchUserReviews,
   fetchCourtReviews,
   fetchCommentsByReviewId,
+  getReviewById,
   updateReview,
   deleteFavoriteCourts,
   deleteScheduledEvents,

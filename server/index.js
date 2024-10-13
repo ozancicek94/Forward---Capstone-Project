@@ -21,6 +21,7 @@ const {
   fetchUserReviews,
   fetchCourtReviews,
   fetchCommentsByReviewId,
+  getReviewById,
   updateReview,
   deleteFavoriteCourts,
   deleteScheduledEvents,
@@ -406,10 +407,10 @@ app.post('/api/reviews/:reviewId/comments', isLoggedIn, async (req, res, next) =
 });
 
 // PATCH route for updating a review
-app.patch('/api/courts/:courtId/reviews/:reviewId', isLoggedIn, async (req, res, next) => {
+app.patch('/api/reviews/:reviewId', isLoggedIn, async (req, res, next) => {
   try {
-    const { review, rating } = req.body;
     const { reviewId } = req.params;
+    const { review, rating } = req.body;
 
     if (!review || rating == null) {
       const error = new Error('Review and rating are required');
@@ -417,14 +418,22 @@ app.patch('/api/courts/:courtId/reviews/:reviewId', isLoggedIn, async (req, res,
       throw error;
     }
 
-    // Ensure that the user can only update their own review
+    // Ensure the logged-in user is the one who created the review
     const existingReview = await getReviewById(reviewId);
-    if (!existingReview || existingReview.user_id !== req.user.id) {
-      return res.status(403).json({ error: "You can only edit your own reviews" });
+    if (existingReview.user_id !== req.user.id) {
+      const error = new Error('You are not authorized to update this review');
+      error.status = 403;
+      throw error;
     }
 
-    const updatedReview = await updateReview(reviewId, { review, rating });
-    res.status(200).send(updatedReview);
+    // Proceed with updating the review
+    const updatedReview = await updateReview({
+      id: reviewId,
+      review,
+      rating
+    });
+
+    res.send(updatedReview);
   } catch (error) {
     next(error);
   }
