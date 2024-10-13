@@ -407,12 +407,12 @@ export default function SingleCourt() {
 
   const handleUpdateReview = async () => {
     const token = localStorage.getItem("token");
-
+  
     if (!token) {
       setMessage("Please log in to update the review.");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `https://forward-capstone-project.onrender.com/api/reviews/${editReviewId}`,
@@ -428,7 +428,7 @@ export default function SingleCourt() {
           }),
         }
       );
-
+  
       if (response.ok) {
         const updatedReview = await response.json();
         setCourtReviews((prevReviews) => prevReviews.map((r) => (r.id === editReviewId ? updatedReview : r)));
@@ -437,7 +437,8 @@ export default function SingleCourt() {
         setEditReviewText("");
         setEditRating(null);
       } else {
-        setMessage("Failed to update review.");
+        const errorData = await response.json();
+        setMessage(`Failed to update review: ${errorData.message || response.statusText}`);
       }
     } catch (error) {
       console.error("Error updating review", error);
