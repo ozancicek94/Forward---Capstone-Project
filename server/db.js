@@ -83,7 +83,7 @@ CREATE TABLE comments (
   user_id UUID REFERENCES users(id) NOT NULL,
   review_id UUID REFERENCES reviews(id) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT user_review_comment_unique UNIQUE (user_id, review_id)
+  
 );
 
     
@@ -428,6 +428,7 @@ module.exports = {
   deleteFavoriteCourts,
   deleteScheduledEvents,
   deleteUserReview,
+  deleteComment,
   calculateAverageRating,
   authenticate,
   findUserByToken,

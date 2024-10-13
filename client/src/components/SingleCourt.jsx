@@ -317,11 +317,13 @@ export default function SingleCourt() {
         );
         const updatedCommentsData = await updatedCommentsResponse.json();
 
-        // Update the comments for that review and clear the input
+        // Update the comments for that review
         setComments((prevComments) => ({
           ...prevComments,
           [reviewId]: updatedCommentsData,
         }));
+
+        // Clear the new comment input
         setNewComments((prevComments) => ({ ...prevComments, [reviewId]: '' }));
         setMessage("Comment added successfully!");
       } else {
@@ -331,7 +333,7 @@ export default function SingleCourt() {
       console.error("Error adding comment", error);
       setMessage("An error occurred while adding your comment.");
     }
-  };
+};
 
   // Delete a comment
   const handleDeleteComment = async (commentId, reviewId) => {
@@ -402,15 +404,15 @@ export default function SingleCourt() {
                       <p>{review.user_name}</p>
                       <h4>Comments</h4>
                       <ul>
-                        {(comments[review.id] || []).map((comment) => (
-                          <li key={comment.id}>
-                            <p>{comment.username}: {comment.comment}</p>
-                            {comment.user_id === localStorage.getItem("id") && (
-                              <button onClick={() => handleDeleteComment(comment.id, review.id)}>Delete</button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
+  {(comments[review.id] || []).map((comment) => (
+    <li key={comment.id}>
+      <p>{comment.username}: {comment.comment}</p>
+      {comment.user_id === localStorage.getItem("id") && (
+        <button onClick={() => handleDeleteComment(comment.id, review.id)}>Delete</button>
+      )}
+    </li>
+  ))}
+</ul>
                       <textarea
                         className="loginInput"
                         value={newComments[review.id] || ''}
