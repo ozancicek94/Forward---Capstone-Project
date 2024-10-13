@@ -125,7 +125,7 @@ export default function Account() {
                   {favoriteCourts.map((court) => (
                     <li key={court.fav_id}>
                       <h3>{court.name}</h3>
-                      <img src={court.photoURL} alt={court.name} style={{ width: '200px', height: 'auto' }} />
+                      <img src={court.photourl} alt={court.name} style={{ width: '5em', height: 'auto' }} />
                       <p>{court.neighborhood}</p>
                       <Link to={`/Courts/${court.id}`}>
                         <button>See Details</button>
