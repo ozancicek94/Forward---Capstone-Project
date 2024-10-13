@@ -414,6 +414,7 @@ module.exports = {
   createSport,
   createScheduledEvents,
   createReview,
+  createComment,
   fetchFavoriteCourts,
   fetchUsers,
   fetchCities,

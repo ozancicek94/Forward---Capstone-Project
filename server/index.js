@@ -10,6 +10,7 @@ const {
   createSport,
   createScheduledEvents,
   createReview,
+  createComment,
   fetchUsers,
   fetchCities,
   fetchSports,
