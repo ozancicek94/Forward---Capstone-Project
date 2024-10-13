@@ -339,7 +339,7 @@ export default function SingleCourt() {
 
   if (!court) return <div>Loading...</div>;
 
-  rreturn (
+  return (
     <div>
       <img
         onClick={() => {
