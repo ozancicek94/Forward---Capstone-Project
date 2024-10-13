@@ -18,9 +18,13 @@ export default function SingleCourt() {
   const [courtReviews, setCourtReviews] = useState([]);
   const [newComments, setNewComments] = useState({});
   const [comments, setComments] = useState({});
+  const [commentsVisible, setCommentsVisible] = useState({}); // New state to track visibility of comments
+  const [averageRating, setAverageRating] = useState(null); 
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    
     const fetchSingleCourt = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -47,6 +51,8 @@ export default function SingleCourt() {
   
         const userData = await userRequest.json();
         const userId = userData.id; // Ensure user_id is correctly fetched
+        localStorage.setItem('userId', userId);  // Store user ID in localStorage
+        console.log('Logged-in User ID:', userId);
   
         // Fetch favorite courts
         const favCourtsResponse = await fetch(
@@ -75,6 +81,16 @@ export default function SingleCourt() {
         );
         const courtReviewsData = await courtReviewsResponse.json();
         setCourtReviews(courtReviewsData);
+
+        const user_Id = localStorage.getItem('token');  // This should get the logged-in user's ID
+        console.log('Logged-in User ID:', user_Id);
+
+        // Fetch the average rating from the API
+        const averageRatingResponse = await fetch(`https://forward-capstone-project.onrender.com/api/courts/${response.id}/average-rating`);
+        const averageRatingData = await averageRatingResponse.json();
+        setAverageRating(averageRatingData.averageRating);  // Set the average rating in state
+
+
   
       } catch (error) {
         console.error("Error fetching court reviews!", error);
@@ -157,6 +173,13 @@ export default function SingleCourt() {
       console.error("Error adding review", error);
       setMessage("An error occurred while adding your review.");
     }
+  };
+
+  const toggleCommentsVisibility = (reviewId) => {
+    setCommentsVisible((prevState) => ({
+      ...prevState,
+      [reviewId]: !prevState[reviewId],
+    }));
   };
 
 
@@ -322,19 +345,15 @@ export default function SingleCourt() {
       );
   
       if (response.ok) {
-        // Fetch updated comments for the specific review
         const updatedCommentsResponse = await fetch(
           `https://forward-capstone-project.onrender.com/api/reviews/${reviewId}/comments`
         );
         const updatedCommentsData = await updatedCommentsResponse.json();
   
-        // Update the comments for that review
         setComments((prevComments) => ({
           ...prevComments,
           [reviewId]: updatedCommentsData,
         }));
-  
-        // Clear the new comment input
         setNewComments((prevComments) => ({ ...prevComments, [reviewId]: '' }));
         setMessage("Comment added successfully!");
       } else {
@@ -404,38 +423,10 @@ export default function SingleCourt() {
             <h2>{court.name}</h2>
             <img className="singleCourtImage" src={court.photourl} alt={court.name} />
 
-            <div className="courtReviews">
-              <h2>Court Reviews</h2>
-              <ul>
-                {courtReviews.map((review) => (
-                  <li className="reviewItem" key={review.id}>
-                    <img className="courtReviewImages" src={review.user_photo} alt={review.user_name} />
-                    <div className="reviewDetails">
-                      <h2 className="review">{review.review}</h2>
-                      <p>{review.user_name}</p>
-                      <h4>Comments</h4>
-                      <ul>
-  {(comments[review.id] || []).map((comment) => (
-    <li key={comment.id}>
-      <p>{comment.username}: {comment.comment}</p>
-      {comment.user_id === localStorage.getItem("id") && (
-        <button onClick={() => handleDeleteComment(comment.id, review.id)}>Delete</button>
-      )}
-    </li>
-  ))}
-</ul>
-                      <textarea
-                        className="loginInput"
-                        value={newComments[review.id] || ''}
-                        onChange={(e) => setNewComments({ ...newComments, [review.id]: e.target.value })}
-                        placeholder="Add a comment"
-                      />
-                      <button onClick={() => handleAddComment(review.id)}>Add Comment</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Display the average rating */}
+      <div className="courtRating">
+        <h3>Average Rating: {averageRating !== null ? `${averageRating} / 5` : 'No ratings yet'}</h3>
+      </div>
 
             {!isFavorite && (
               <button onClick={handleAddToFavorites}>
@@ -454,6 +445,59 @@ export default function SingleCourt() {
               />
               <button onClick={handleScheduleEvent}>Schedule Event</button>
             </div>
+
+            
+
+            <div className="courtReviews">
+              <h2>Reviews</h2>
+              <ul>
+  {courtReviews.map((review) => (
+    <li className="reviewItem" key={review.id}>
+      <img className="courtReviewImages" src={review.user_photo} alt={review.user_name} />
+      <div className="reviewDetails">
+        <h2 className="review">{review.review}</h2>
+        <p>{review.user_name}</p>
+        <button className="showCommentsButton" onClick={() => setCommentsVisible(prev => ({ ...prev, [review.id]: !prev[review.id] }))}>
+          {commentsVisible[review.id] ? 'Hide Comments' : 'Show Comments'}
+        </button>
+
+        {commentsVisible[review.id] && (
+          <div className="commentPopup">
+            <h4>Comments</h4>
+            <ul>
+              {(comments[review.id] || []).map((comment) => (
+                <li key={comment.id}>
+                  <p>{comment.username}: {comment.comment}</p>
+
+                  {/* Add console logs to debug */}
+                  {console.log("Comment User ID:", comment.user_id)}
+                  {console.log("2Logged-in User ID:", localStorage.getItem('userId'))}
+
+                  {/* Show delete button only if the comment belongs to the logged-in user */}
+                  {comment.user_id === localStorage.getItem('userId') && (
+                    <button onClick={() => handleDeleteComment(comment.id, review.id)}>Delete</button>
+                  )}
+                  {/* Add a horizontal line after each comment */}
+                  <hr />
+                </li>
+              ))}
+            </ul>
+            <textarea
+              className="loginInput"
+              value={newComments[review.id] || ''}
+              onChange={(e) => setNewComments({ ...newComments, [review.id]: e.target.value })}
+              placeholder="Add a comment"
+            />
+            <button onClick={() => handleAddComment(review.id)}>Add Comment</button>
+          </div>
+        )}
+      </div>
+    </li>
+  ))}
+</ul>
+            </div>
+
+            
           </div>
 
           <div className="courtRight">
@@ -470,4 +514,5 @@ export default function SingleCourt() {
       </div>
     </div>
   );
+
 }

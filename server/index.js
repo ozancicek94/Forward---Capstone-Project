@@ -224,6 +224,17 @@ app.get('/api/reviews/:reviewId/comments', async (req, res, next) => {
   }
 });
 
+app.get('/api/courts/:courtId/average-rating', async (req, res) => {
+  const { courtId } = req.params;
+
+  try {
+    const averageRating = await calculateAverageRating(courtId);
+    res.json({ averageRating });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to calculate average rating' });
+  }
+});
+
 app.delete('/api/users/:userId/favCourts/:id', isLoggedIn, async(req, res, next)=> {
   try {
     if(req.params.userId !== req.user.id){

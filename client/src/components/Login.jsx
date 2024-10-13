@@ -27,6 +27,7 @@ export default function Login ({setIsLoggedIn}) {
       if(response.token) {localStorage.setItem("token", response.token);
       navigate("/courts");
       setIsLoggedIn(true);
+      localStorage.setItem('id', response.id);
       // window.location.reload();
        }
       else {

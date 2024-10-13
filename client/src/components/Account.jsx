@@ -275,32 +275,9 @@ export default function Account() {
                       >
                         Remove
                       </button>
+                      <hr />
   
-                      {/* Comments Section */}
-                      <h4>Comments</h4>
-                      <ul>
-                        {comments[review.id]?.map((comment) => (
-                          <li key={comment.id}>
-                            <p>{comment.username}: {comment.comment}</p>
-                            {comment.user_id === user.id && (
-                              <button onClick={() => handleCommentDelete(comment.id)}>
-                                Delete
-                              </button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-  
-                      {/* Add Comment Input */}
-                      <input
-                        type="text"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a comment"
-                      />
-                      <button onClick={() => handleCommentSubmit(review.id)}>
-                        Submit Comment
-                      </button>
+                      
                     </li>
                   ))}
                 </ul>
