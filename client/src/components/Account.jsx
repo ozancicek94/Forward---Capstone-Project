@@ -13,6 +13,8 @@ export default function Account() {
   const [eventsDeleted, setEventsDeleted] = useState(false);
   const [favCourtDeleted, setFavCourtDeleted] = useState(false);
   const [reviewDeleted, setReviewDeleted] = useState(false);
+  const [comments, setComments] = useState({});
+  const [newComment, setNewComment] = useState('');
   const navigate = useNavigate();
   
 
@@ -68,12 +70,22 @@ export default function Account() {
           }
         );
 
-        console.log("Reviews response", reviewsResponse);
-        console.log("token here", token);
-        console.log("userData is here", userData);
         const reviewsData = await reviewsResponse.json();
-        console.log("reviewsData is here", reviewsData);
         setUserReviews(reviewsData);
+
+        // Fetch comments for each review
+        reviewsData.forEach(async (review) => {
+          const commentsResponse = await fetch(`/api/reviews/${review.id}/comments`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const commentsData = await commentsResponse.json();
+          setComments((prevComments) => ({
+            ...prevComments,
+            [review.id]: commentsData,
+          }));
+        });
 
       } catch (error) {
         console.error("Error fetching review data:", error);
@@ -82,9 +94,6 @@ export default function Account() {
 
     fetchData();
   }, [eventsDeleted, favCourtDeleted, reviewDeleted]); // Re-fetch if events are deleted
-
-  console.log("sched events are here", scheduledEvents);
-  console.log("user is here", user);
 
   const handleDelete = async (eventID) => {
     const token = localStorage.getItem("token");
@@ -127,7 +136,7 @@ export default function Account() {
       );
 
       if (response.ok) {
-        setReviewDeleted(!reviewDeleted); // Toggle state to re-fetch events
+        setReviewDeleted(!reviewDeleted); // Toggle state to re-fetch reviews
       } else {
         console.error("Error deleting review");
       }
@@ -161,6 +170,37 @@ export default function Account() {
     }
   };
 
+  const handleCommentSubmit = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch(`/api/reviews/${reviewId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ comment: newComment })
+      });
+      setNewComment('');
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  };
+
+  const handleCommentDelete = async (commentId) => {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch(`/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
+  };
+
   // Conditionally render user and events
   if (!user) {
     return <p>Loading user data...</p>;
@@ -171,84 +211,134 @@ export default function Account() {
       <img className="bigCityImage" src={accountPagePhoto} alt="City Image" />
       <img onClick={() => {navigate(`/Courts`)}} className="topLogo" src={topLogo} alt="Logo" />
       <img className="leftLogo" src={logo} alt="Logo" />
-    <div className="courtList">
-    <div className="accountPage">
-  <div className="leftContent">
-    <h1>{user.name}'s Account</h1>
-    <div className="favCourts">
-    <h2>Favorite Courts</h2>
-    {favoriteCourts.length === 0 ? (
-      <p>No favorite courts.</p>
-    ) : (
-      <ul>
-        {favoriteCourts.map((court) => (
-          <li key={court.fav_id}>
-            <h3>{court.name}</h3>
-            <img src={court.photourl} alt={court.name} style={{ width: '200px', height: 'auto' }} />
-            <p>{court.neighborhood}</p>
-            <Link to={`/Courts/${court.id}`}>
-              <button>See Details</button>
-            </Link>
-            <button className="favCourtRemoveButton" type="button" onClick={() => handleFavDelete(court.fav_id)}>
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
-    )}
-    </div>
-
-    <div className="userReviews">
-    <h2>User's Reviews</h2>
-    {userReviews.length === 0 ? (
-      <p>No reviews yet.</p>
-    ) : (
-      <ul>
-        {userReviews.map((review) => (
-          <li key={review.id}>
-            <h3>{review.court_name}</h3>
-            <img src={review.court_photo} alt={review.court_name} style={{ width: '3em', height: 'auto' }} />
-            <p>{review.review}</p>
-            <p>{review.rating}</p>
-            <Link to={`/Courts/${review.court_id}`}>
-              <button>See Details</button>
-            </Link>
-            <button className="favCourtRemoveButton" type="button" onClick={() => handleReviewDelete(review.id)}>
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
-    )}
-    </div>
-  </div>
-
-  <div className="rightContent">
-    <img className="profilePhoto" src={user.photourl} alt={user.name} />
-    <div className="schedEvents">
-    <img className="schedEventsIcon" src={schedEventsIcon} alt="Logo" />
-    <h2>Scheduled Events</h2>
-    {scheduledEvents.length === 0 ? (
-      <p>No scheduled events.</p>
-    ) : (
-      <ul>
-        {scheduledEvents.map((event) => (
-          <li key={event.id}>
-            <h2>{event.court_name}</h2>
-            <p>{event.court_neighborhood}</p>
-            <img src={event.court_photo} alt={event.court_name} style={{ width: '200px', height: 'auto' }} />
-            <p>{event.datetime}</p>
-            <button type="button" onClick={() => handleDelete(event.id)}>
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-    )}
-    </div>
-  </div>
-</div>
-    </div>
+      <div className="courtList">
+        <div className="accountPage">
+          <div className="leftContent">
+            <h1>{user.name}'s Account</h1>
+  
+            {/* Favorite Courts Section */}
+            <div className="favCourts">
+              <h2>Favorite Courts</h2>
+              {favoriteCourts.length === 0 ? (
+                <p>No favorite courts.</p>
+              ) : (
+                <ul>
+                  {favoriteCourts.map((court) => (
+                    <li key={court.fav_id}>
+                      <h3>{court.name}</h3>
+                      <img
+                        src={court.photourl}
+                        alt={court.name}
+                        style={{ width: '200px', height: 'auto' }}
+                      />
+                      <p>{court.neighborhood}</p>
+                      <Link to={`/Courts/${court.id}`}>
+                        <button>See Details</button>
+                      </Link>
+                      <button
+                        className="favCourtRemoveButton"
+                        type="button"
+                        onClick={() => handleFavDelete(court.fav_id)}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+  
+            {/* User's Reviews Section */}
+            <div className="userReviews">
+              <h2>User's Reviews</h2>
+              {userReviews.length === 0 ? (
+                <p>No reviews yet.</p>
+              ) : (
+                <ul>
+                  {userReviews.map((review) => (
+                    <li key={review.id}>
+                      <h3>{review.court_name}</h3>
+                      <img
+                        src={review.court_photo}
+                        alt={review.court_name}
+                        style={{ width: '3em', height: 'auto' }}
+                      />
+                      <p>{review.review}</p>
+                      <p>{review.rating}</p>
+                      <Link to={`/Courts/${review.court_id}`}>
+                        <button>See Details</button>
+                      </Link>
+                      <button
+                        className="favCourtRemoveButton"
+                        type="button"
+                        onClick={() => handleReviewDelete(review.id)}
+                      >
+                        Remove
+                      </button>
+  
+                      {/* Comments Section */}
+                      <h4>Comments</h4>
+                      <ul>
+                        {comments[review.id]?.map((comment) => (
+                          <li key={comment.id}>
+                            <p>{comment.username}: {comment.comment}</p>
+                            {comment.user_id === user.id && (
+                              <button onClick={() => handleCommentDelete(comment.id)}>
+                                Delete
+                              </button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+  
+                      {/* Add Comment Input */}
+                      <input
+                        type="text"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Add a comment"
+                      />
+                      <button onClick={() => handleCommentSubmit(review.id)}>
+                        Submit Comment
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+  
+          {/* Right Content - Scheduled Events */}
+          <div className="rightContent">
+            <img className="profilePhoto" src={user.photourl} alt={user.name} />
+            <div className="schedEvents">
+              <img className="schedEventsIcon" src={schedEventsIcon} alt="Logo" />
+              <h2>Scheduled Events</h2>
+              {scheduledEvents.length === 0 ? (
+                <p>No scheduled events.</p>
+              ) : (
+                <ul>
+                  {scheduledEvents.map((event) => (
+                    <li key={event.id}>
+                      <h2>{event.court_name}</h2>
+                      <p>{event.court_neighborhood}</p>
+                      <img
+                        src={event.court_photo}
+                        alt={event.court_name}
+                        style={{ width: '200px', height: 'auto' }}
+                      />
+                      <p>{event.datetime}</p>
+                      <button type="button" onClick={() => handleDelete(event.id)}>
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

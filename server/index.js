@@ -211,6 +211,16 @@ app.get('/api/courts/:id/courtReviews', async (req, res, next) => {
   }
 });
 
+app.get('/api/reviews/:reviewId/comments', async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const comments = await fetchCommentsByReviewId(reviewId);
+    res.send(comments);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.delete('/api/users/:userId/favCourts/:id', isLoggedIn, async(req, res, next)=> {
   try {
     if(req.params.userId !== req.user.id){
@@ -253,6 +263,16 @@ app.delete('/api/users/:userId/userReviews/:id',isLoggedIn, async(req, res, next
   }
   catch(ex){
     next(ex);
+  }
+});
+
+app.delete('/api/comments/:commentId', isLoggedIn, async (req, res, next) => {
+  try {
+    const { commentId } = req.params;
+    await deleteComment({ user_id: req.user.id, id: commentId });
+    res.sendStatus(204);
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -343,6 +363,29 @@ app.post('/api/courts/:courtId/reviews', isLoggedIn, async (req, res, next) => {
     } else {
       next(error);
     }
+  }
+});
+
+app.post('/api/reviews/:reviewId/comments', isLoggedIn, async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { comment } = req.body;
+
+    if (!comment) {
+      const error = new Error('Comment is required');
+      error.status = 400;
+      throw error;
+    }
+
+    const newComment = await createComment({
+      comment,
+      user_id: req.user.id, // From the logged-in user
+      review_id: reviewId,
+    });
+
+    res.status(201).send(newComment);
+  } catch (error) {
+    next(error);
   }
 });
 

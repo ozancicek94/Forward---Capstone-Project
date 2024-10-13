@@ -15,6 +15,7 @@ const createTables = async()=> {
     DROP TABLE IF EXISTS scheduled_events CASCADE;
     DROP TABLE IF EXISTS favorite_courts CASCADE;
     DROP TABLE IF EXISTS reviews CASCADE;
+    DROP TABLE IF EXISTS comments CASCADE;
     DROP TABLE IF EXISTS users CASCADE;
     DROP TABLE IF EXISTS cities CASCADE;
     DROP TABLE IF EXISTS sports CASCADE;
@@ -74,6 +75,15 @@ const createTables = async()=> {
   user_id UUID REFERENCES users(id) NOT NULL,
   court_id UUID REFERENCES courts(id) NOT NULL,
   CONSTRAINT user_court_unique UNIQUE (user_id, court_id)  -- Add unique constraint here
+);
+
+CREATE TABLE comments (
+  id UUID PRIMARY KEY,
+  comment TEXT NOT NULL,
+  user_id UUID REFERENCES users(id) NOT NULL,
+  review_id UUID REFERENCES reviews(id) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT user_review_comment_unique UNIQUE (user_id, review_id)
 );
 
     
@@ -137,6 +147,16 @@ const createReview = async({ review, rating, user_id, court_id })=> {
     INSERT INTO reviews(id, review, rating, user_id, court_id) VALUES ($1, $2, $3, $4, $5) RETURNING * 
   `;
   const response = await client.query(SQL, [ uuid.v4(), review, rating, user_id, court_id]);
+  return response.rows[0];
+};
+
+const createComment = async ({ comment, user_id, review_id }) => {
+  const SQL = `
+    INSERT INTO comments(id, comment, user_id, review_id, created_at) 
+    VALUES ($1, $2, $3, $4, NOW()) 
+    RETURNING *;
+  `;
+  const response = await client.query(SQL, [uuid.v4(), comment, user_id, review_id]);
   return response.rows[0];
 };
 
@@ -288,6 +308,18 @@ const fetchCourtReviews = async(court_id) => {
   return response.rows;
 };
 
+const fetchCommentsByReviewId = async (review_id) => {
+  const SQL = `
+    SELECT comments.*, users.username, users.photourl
+    FROM comments
+    JOIN users ON comments.user_id = users.id
+    WHERE review_id = $1
+    ORDER BY created_at DESC;
+  `;
+  const response = await client.query(SQL, [review_id]);
+  return response.rows;
+};
+
 // Create methods to delete Favorite Courts and Scheduled Events
 
 const deleteFavoriteCourts = async({user_id, id})=> {
@@ -315,6 +347,14 @@ const deleteUserReview = async({user_id, id})=> {
     WHERE user_id = $1 AND id = $2
   `;
   await client.query(SQL, [ user_id, id ]);
+};
+
+const deleteComment = async ({ user_id, id }) => {
+  const SQL = `
+    DELETE FROM comments 
+    WHERE user_id = $1 AND id = $2;
+  `;
+  await client.query(SQL, [user_id, id]);
 };
 
 // Create the calculateAverageRating function:
