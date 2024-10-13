@@ -18,9 +18,10 @@ export default function SingleCourt() {
   const [courtReviews, setCourtReviews] = useState([]);
   const [newComments, setNewComments] = useState({});
   const [comments, setComments] = useState({});
-  const [commentsVisible, setCommentsVisible] = useState({}); // New state to track visibility of comments
+  const [commentsVisible, setCommentsVisible] = useState({}); 
   const [averageRating, setAverageRating] = useState(null); 
   const navigate = useNavigate();
+
 
   useEffect(() => {
 
@@ -152,22 +153,21 @@ export default function SingleCourt() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ review, rating }),
+          body: JSON.stringify({ 
+            review, 
+            rating: parseInt(rating, 10) // Ensure rating is sent as an integer
+          }),
         }
       );
 
       if (response.ok) {
-        const updatedReviews = await fetch(
-          `https://forward-capstone-project.onrender.com/api/courts/${id}/courtReviews`
-        );
-        const updatedReviewsData = await updatedReviews.json();
-        setCourtReviews(updatedReviewsData); 
+        const newReview = await response.json();
+        setCourtReviews((prevReviews) => [...prevReviews, newReview]);
         setMessage("Review added successfully!");
         setReview(""); 
         setRating(null); 
       } else {
-        const newReview = await response.json();
-        setMessage(newReview.error || "Failed to add review.");
+        setMessage("Failed to add review.");
       }
     } catch (error) {
       console.error("Error adding review", error);
@@ -175,12 +175,6 @@ export default function SingleCourt() {
     }
   };
 
-  const toggleCommentsVisibility = (reviewId) => {
-    setCommentsVisible((prevState) => ({
-      ...prevState,
-      [reviewId]: !prevState[reviewId],
-    }));
-  };
 
 
   const handleScheduleEvent = async() => {
@@ -433,6 +427,25 @@ export default function SingleCourt() {
                 Add to My Favorite Courts
               </button>
             )}
+
+            {/* Add review form */}
+            <div className="addReview">
+              <h2>Add a Review</h2>
+              <textarea
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
+                placeholder="Write your review here"
+              />
+              <input
+                type="number"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                min="1"
+                max="5"
+                placeholder="Rate out of 5"
+              />
+              <button onClick={handleAddReview}>Submit Review</button>
+            </div>
 
             <div className="singleCourtSchedEvent">
               <img className="schedEventsSingleCourt" src={schedEventsIcon} alt="Logo" />
