@@ -1,57 +1,48 @@
-/* TODO - add your code to create a functional React component that renders details for a single court. Fetch the court data from the provided API. You may consider conditionally rendering a 'ScheduleEvent' button for logged in users. */
 import { useState, useEffect } from "react";
-import {useParams, useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import logo from '../assets/ForwardLogo.svg';
 import topLogo from '../assets/Foward_GotoHomapageLogo.svg';
 import basketballLogo from '../assets/BasketballIcon.svg';
 import schedEventsIcon from '../assets/schedEventsIcon.svg';
 import bigCityImage from '../assets/BigNYImage_02.jpg';
 
-export default function SingleCourt () {
-
+export default function SingleCourt() {
   const { id } = useParams();
   const [court, setCourt] = useState(null);
   const [message, setMessage] = useState("");
-  const [dateTime, setDateTime] = useState(""); 
-  const [rating, setRating] = useState(null); 
-  const [review, setReview] = useState(""); 
+  const [dateTime, setDateTime] = useState("");
+  const [rating, setRating] = useState(null);
+  const [review, setReview] = useState("");
   const [favoriteCourts, setFavoriteCourts] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [courtReviews, setCourtReviews] = useState([]);
+  const [comments, setComments] = useState({});
+  const [newComment, setNewComment] = useState("");
   const navigate = useNavigate();
 
-  useEffect(()=> {
-
-    const fetchSingleCourt = async() => {
-      try{
-        const token = localStorage.getItem("token"); 
-        console.log("Token is here", token);
-
+  useEffect(() => {
+    const fetchSingleCourt = async () => {
+      try {
+        const token = localStorage.getItem("token");
         const request = await fetch(`https://forward-capstone-project.onrender.com/api/courts/${id}`, {
-          headers:{
+          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-          }
+          },
         });
-        if (!request.ok) {
-          throw new Error('Court not found');
-        };
+        if (!request.ok) throw new Error("Court not found");
+
         const response = await request.json();
-
-        console.log("Fetched single court is here:", response);
-
         setCourt(response);
-        setRating(response.rating || ''); // Set rating after court is fetched
-        setReview(response.review || '');
+        setRating(response.rating || "");
+        setReview(response.review || "");
 
-        // Fetch the user's favorite courts
         const userRequest = await fetch("https://forward-capstone-project.onrender.com/api/auth/me", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-
         const userData = await userRequest.json();
 
         const favCourtsResponse = await fetch(
@@ -63,25 +54,19 @@ export default function SingleCourt () {
             },
           }
         );
-
         const favCourtsData = await favCourtsResponse.json();
         setFavoriteCourts(favCourtsData);
-        
-
-        // Check if the current court is already in the favorites list
         const isCourtFavorite = favCourtsData.some((favCourt) => favCourt.id === response.id);
-        setIsFavorite(isCourtFavorite);  
-
-        // Fetch courtReviews
+        setIsFavorite(isCourtFavorite);
 
         const courtReviewsResponse = await fetch(
-          `https://forward-capstone-project.onrender.com/api/courts/${court.id}/courtReviews`);
-
+          `https://forward-capstone-project.onrender.com/api/courts/${response.id}/courtReviews`
+        );
         const courtReviewsData = await courtReviewsResponse.json();
         setCourtReviews(courtReviewsData);
-
-
-      } catch(error) {console.error("Error fetching court reviews!", error )}
+      } catch (error) {
+        console.error("Error fetching court data!", error);
+      }
     };
     fetchSingleCourt();
   }, [id]);
@@ -101,7 +86,6 @@ export default function SingleCourt () {
           console.error("Error fetching court reviews!", error);
         }
       };
-  
       fetchCourtReviews();
     }
   }, [court]);
@@ -150,6 +134,65 @@ export default function SingleCourt () {
     } catch (error) {
       console.error("Error adding review", error);
       setMessage("An error occurred while adding your review.");
+    }
+  };
+
+  // Create handleAddComments function
+
+  const handleAddComment = async (reviewId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setMessage("Please log in to add a comment.");
+      return;
+    }
+
+    if (!newComment) {
+      setMessage("Please enter a comment.");
+      return;
+    }
+
+    try {
+      await fetch(
+        `https://forward-capstone-project.onrender.com/api/reviews/${reviewId}/comments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ comment: newComment }),
+        }
+      );
+      setNewComment(""); // Clear the input after submission
+      const updatedReviews = await fetch(
+        `https://forward-capstone-project.onrender.com/api/courts/${id}/courtReviews`
+      );
+      const updatedReviewsData = await updatedReviews.json();
+      setCourtReviews(updatedReviewsData);
+    } catch (error) {
+      console.error("Error adding comment", error);
+      setMessage("An error occurred while adding your comment.");
+    }
+  };
+
+  // Add handleDeleteComments function
+
+  const handleDeleteComment = async (commentId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await fetch(`https://forward-capstone-project.onrender.com/api/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const updatedReviews = await fetch(
+        `https://forward-capstone-project.onrender.com/api/courts/${id}/courtReviews`
+      );
+      const updatedReviewsData = await updatedReviews.json();
+      setCourtReviews(updatedReviewsData);
+    } catch (error) {
+      console.error("Error deleting comment", error);
     }
   };
 
@@ -296,7 +339,7 @@ export default function SingleCourt () {
 
   if (!court) return <div>Loading...</div>;
 
-  return (
+  rreturn (
     <div>
       <img
         onClick={() => {
@@ -310,12 +353,12 @@ export default function SingleCourt () {
       <img className="leftLogo" src={logo} alt="Logo" />
       <div className="courtList">
         <img className="BasketballIcon" src={basketballLogo} alt="Logo" />
-
+  
         <div className="courtContent">
           <div className="courtLeft">
             <h2>{court.name}</h2>
             <img className="singleCourtImage" src={court.photourl} alt={court.name} />
-
+  
             <p className="ratingReviewText">Rating: {court.rating} / 5</p>
             <p className="loginLabel">Add Rating and Review</p>
             <input
@@ -332,10 +375,10 @@ export default function SingleCourt () {
               placeholder="Enter new review"
             />
             <button onClick={handleAddReview}>Submit Review</button>
-
+  
             <div className="courtReviews">
               <h2>Court Reviews</h2>
-
+  
               <ul>
                 {courtReviews.map((review) => (
                   <li className="reviewItem" key={review.id}>
@@ -343,19 +386,38 @@ export default function SingleCourt () {
                     <div className="reviewDetails">
                       <h2 className="review">{review.review}</h2>
                       <p>{review.user_name}</p>
+  
+                      {/* Comments Section */}
+                      <h4>Comments</h4>
+                      <ul>
+                        {review.comments.map((comment) => (
+                          <li key={comment.id}>
+                            <p>{comment.username}: {comment.comment}</p>
+                            {comment.user_id === court.user_id && (
+                              <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                      <input
+                        type="text"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Add a comment"
+                      />
+                      <button onClick={() => handleAddComment(review.id)}>Submit Comment</button>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
-
-            {/* Add to Favorites Button */}
+  
             {!isFavorite && (
               <button onClick={handleAddToFavorites}>
                 Add to My Favorite Courts
               </button>
             )}
-
+  
             <div className="singleCourtSchedEvent">
               <img className="schedEventsSingleCourt" src={schedEventsIcon} alt="Logo" />
               <input
@@ -368,7 +430,7 @@ export default function SingleCourt () {
               <button onClick={handleScheduleEvent}>Schedule Event</button>
             </div>
           </div>
-
+  
           <div className="courtRight">
             <p>
               <a href={court.googlemapslink} target="_blank" rel="noopener noreferrer">
