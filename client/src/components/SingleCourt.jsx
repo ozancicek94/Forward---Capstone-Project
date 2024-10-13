@@ -86,19 +86,30 @@ export default function SingleCourt() {
 
   useEffect(() => {
     if (court && court.id) {
-      const fetchCourtReviews = async () => {
+      const fetchCourtReviewsAndComments = async () => {
         try {
           const courtReviewsResponse = await fetch(
             `https://forward-capstone-project.onrender.com/api/courts/${court.id}/courtReviews`
           );
           const courtReviewsData = await courtReviewsResponse.json();
           setCourtReviews(courtReviewsData);
+  
+          // Fetch comments for each review
+          const commentsData = {};
+          for (const review of courtReviewsData) {
+            const commentsResponse = await fetch(
+              `https://forward-capstone-project.onrender.com/api/reviews/${review.id}/comments`
+            );
+            const reviewComments = await commentsResponse.json();
+            commentsData[review.id] = reviewComments;
+          }
+          setComments(commentsData);
         } catch (error) {
-          console.error("Error fetching court reviews!", error);
+          console.error("Error fetching court reviews and comments!", error);
         }
       };
-
-      fetchCourtReviews();
+  
+      fetchCourtReviewsAndComments();
     }
   }, [court]);
 
@@ -296,7 +307,7 @@ export default function SingleCourt() {
       setMessage("Please log in to add a comment.");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `https://forward-capstone-project.onrender.com/api/reviews/${reviewId}/comments`,
@@ -309,20 +320,20 @@ export default function SingleCourt() {
           body: JSON.stringify({ comment: newComments[reviewId] || '' }),
         }
       );
-
+  
       if (response.ok) {
         // Fetch updated comments for the specific review
         const updatedCommentsResponse = await fetch(
           `https://forward-capstone-project.onrender.com/api/reviews/${reviewId}/comments`
         );
         const updatedCommentsData = await updatedCommentsResponse.json();
-
+  
         // Update the comments for that review
         setComments((prevComments) => ({
           ...prevComments,
           [reviewId]: updatedCommentsData,
         }));
-
+  
         // Clear the new comment input
         setNewComments((prevComments) => ({ ...prevComments, [reviewId]: '' }));
         setMessage("Comment added successfully!");
@@ -333,7 +344,7 @@ export default function SingleCourt() {
       console.error("Error adding comment", error);
       setMessage("An error occurred while adding your comment.");
     }
-};
+  };
 
   // Delete a comment
   const handleDeleteComment = async (commentId, reviewId) => {
