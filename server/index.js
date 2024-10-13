@@ -21,6 +21,7 @@ const {
   fetchCourtReviews,
   deleteFavoriteCourts,
   deleteScheduledEvents,
+  deleteUserReview,
   authenticate,
   findUserByToken,
   createNewUser
@@ -240,6 +241,21 @@ app.delete('/api/users/:userId/schedEvents/:id',isLoggedIn, async(req, res, next
   }
 });
 
+app.delete('/api/users/:userId/userReviews/:id',isLoggedIn, async(req, res, next)=> {
+  try {
+    if(req.params.userId !== req.user.id){
+      const error = Error('not authorized');
+      error.status = 401;
+      throw error;
+    }
+    await deleteUserReview({ user_id: req.params.userId, id: req.params.id });
+    res.sendStatus(204);
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
 app.post('/api/users/:id/favCourts', isLoggedIn, async (req, res, next) => {
   try {
     // Ensure the logged-in user matches the user ID in the request URL
@@ -309,6 +325,7 @@ app.post('/api/courts/:courtId/reviews', isLoggedIn, async (req, res, next) => {
       throw error;
     }
 
+    // Try to create the review
     const newReview = await createReview({
       review,
       rating,
@@ -318,7 +335,14 @@ app.post('/api/courts/:courtId/reviews', isLoggedIn, async (req, res, next) => {
 
     res.status(201).send(newReview);
   } catch (error) {
-    next(error);
+    // Catch the unique constraint violation error
+    if (error.code === '23505') { // '23505' is the error code for unique constraint violations in PostgreSQL
+      const conflictError = new Error('User has already submitted a review for this court');
+      conflictError.status = 400;
+      next(conflictError);
+    } else {
+      next(error);
+    }
   }
 });
 

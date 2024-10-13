@@ -68,13 +68,13 @@ const createTables = async()=> {
     );
 
     CREATE TABLE reviews(
-      id UUID PRIMARY KEY,
-      review VARCHAR(10000) NOT NULL,
-      rating integer NOT NULL,
-      user_id UUID REFERENCES users(id) NOT NULL,
-      court_id UUID REFERENCES courts(id) NOT NULL
-      
-    );
+  id UUID PRIMARY KEY,
+  review VARCHAR(10000) NOT NULL,
+  rating INTEGER NOT NULL,
+  user_id UUID REFERENCES users(id) NOT NULL,
+  court_id UUID REFERENCES courts(id) NOT NULL,
+  CONSTRAINT user_court_unique UNIQUE (user_id, court_id)  -- Add unique constraint here
+);
 
     
   `;
@@ -308,6 +308,15 @@ const deleteScheduledEvents = async({user_id, id})=> {
   await client.query(SQL, [ user_id, id ]);
 };
 
+const deleteUserReview = async({user_id, id})=> {
+  const SQL = `
+    DELETE
+    FROM reviews
+    WHERE user_id = $1 AND id = $2
+  `;
+  await client.query(SQL, [ user_id, id ]);
+};
+
 // Create the calculateAverageRating function:
 
 const calculateAverageRating = async (courtId) => {
@@ -376,6 +385,7 @@ module.exports = {
   fetchCourtReviews,
   deleteFavoriteCourts,
   deleteScheduledEvents,
+  deleteUserReview,
   calculateAverageRating,
   authenticate,
   findUserByToken,
