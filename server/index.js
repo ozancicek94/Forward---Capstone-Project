@@ -21,6 +21,7 @@ const {
   fetchUserReviews,
   fetchCourtReviews,
   fetchCommentsByReviewId,
+  updateReview,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   deleteUserReview,
@@ -399,6 +400,31 @@ app.post('/api/reviews/:reviewId/comments', isLoggedIn, async (req, res, next) =
     });
 
     res.status(201).send(newComment);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PATCH route for updating a review
+app.patch('/api/courts/:courtId/reviews/:reviewId', isLoggedIn, async (req, res, next) => {
+  try {
+    const { review, rating } = req.body;
+    const { reviewId } = req.params;
+
+    if (!review || rating == null) {
+      const error = new Error('Review and rating are required');
+      error.status = 400;
+      throw error;
+    }
+
+    // Ensure that the user can only update their own review
+    const existingReview = await getReviewById(reviewId);
+    if (!existingReview || existingReview.user_id !== req.user.id) {
+      return res.status(403).json({ error: "You can only edit your own reviews" });
+    }
+
+    const updatedReview = await updateReview(reviewId, { review, rating });
+    res.status(200).send(updatedReview);
   } catch (error) {
     next(error);
   }

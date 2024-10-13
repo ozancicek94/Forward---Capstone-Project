@@ -20,6 +20,9 @@ export default function SingleCourt() {
   const [comments, setComments] = useState({});
   const [commentsVisible, setCommentsVisible] = useState({}); 
   const [averageRating, setAverageRating] = useState(null); 
+  const [editReviewId, setEditReviewId] = useState(null); // Add state for review being edited
+  const [editReviewText, setEditReviewText] = useState(""); // Add state for edit review text
+  const [editRating, setEditRating] = useState(null); // Add state for edit rating
   const navigate = useNavigate();
 
 
@@ -395,6 +398,54 @@ export default function SingleCourt() {
     }
   };
 
+  // Handle editing a review
+  const handleEditReview = (reviewId, currentReview, currentRating) => {
+    setEditReviewId(reviewId);
+    setEditReviewText(currentReview);
+    setEditRating(currentRating);
+  };
+
+  const handleUpdateReview = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMessage("Please log in to update the review.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://forward-capstone-project.onrender.com/api/reviews/${editReviewId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ 
+            review: editReviewText, 
+            rating: parseInt(editRating, 10) 
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const updatedReview = await response.json();
+        setCourtReviews((prevReviews) => prevReviews.map((r) => (r.id === editReviewId ? updatedReview : r)));
+        setMessage("Review updated successfully!");
+        setEditReviewId(null);
+        setEditReviewText("");
+        setEditRating(null);
+      } else {
+        setMessage("Failed to update review.");
+      }
+    } catch (error) {
+      console.error("Error updating review", error);
+      setMessage("An error occurred while updating your review.");
+    }
+  };
+
+
   if (!court) return <div>Loading...</div>;
 
   return (
@@ -411,23 +462,23 @@ export default function SingleCourt() {
       <img className="leftLogo" src={logo} alt="Logo" />
       <div className="courtList">
         <img className="BasketballIcon" src={basketballLogo} alt="Logo" />
-
+  
         <div className="courtContent">
           <div className="courtLeft">
             <h2>{court.name}</h2>
             <img className="singleCourtImage" src={court.photourl} alt={court.name} />
-
+  
             {/* Display the average rating */}
-      <div className="courtRating">
-        <h3>Average Rating: {averageRating !== null ? `${averageRating} / 5` : 'No ratings yet'}</h3>
-      </div>
-
+            <div className="courtRating">
+              <h3>Average Rating: {averageRating !== null ? `${averageRating} / 5` : 'No ratings yet'}</h3>
+            </div>
+  
             {!isFavorite && (
               <button onClick={handleAddToFavorites}>
                 Add to My Favorite Courts
               </button>
             )}
-
+  
             {/* Add review form */}
             <div className="addReview">
               <h2>Add a Review</h2>
@@ -446,7 +497,7 @@ export default function SingleCourt() {
               />
               <button onClick={handleAddReview}>Submit Review</button>
             </div>
-
+  
             <div className="singleCourtSchedEvent">
               <img className="schedEventsSingleCourt" src={schedEventsIcon} alt="Logo" />
               <input
@@ -458,61 +509,79 @@ export default function SingleCourt() {
               />
               <button onClick={handleScheduleEvent}>Schedule Event</button>
             </div>
-
-            
-
+  
             <div className="courtReviews">
               <h2>Reviews</h2>
               <ul>
-  {courtReviews.map((review) => (
-    <li className="reviewItem" key={review.id}>
-      <img className="courtReviewImages" src={review.user_photo} alt={review.user_name} />
-      <div className="reviewDetails">
-        <h2 className="review">{review.review}</h2>
-        <p>{review.user_name}</p>
-        <button className="showCommentsButton" onClick={() => setCommentsVisible(prev => ({ ...prev, [review.id]: !prev[review.id] }))}>
-          {commentsVisible[review.id] ? 'Hide Comments' : 'Show Comments'}
-        </button>
-
-        {commentsVisible[review.id] && (
-          <div className="commentPopup">
-            <h4>Comments</h4>
-            <ul>
-              {(comments[review.id] || []).map((comment) => (
-                <li key={comment.id}>
-                  <p>{comment.username}: {comment.comment}</p>
-
-                  {/* Add console logs to debug */}
-                  {console.log("Comment User ID:", comment.user_id)}
-                  {console.log("2Logged-in User ID:", localStorage.getItem('userId'))}
-
-                  {/* Show delete button only if the comment belongs to the logged-in user */}
-                  {comment.user_id === localStorage.getItem('userId') && (
-                    <button onClick={() => handleDeleteComment(comment.id, review.id)}>Delete</button>
-                  )}
-                  {/* Add a horizontal line after each comment */}
-                  <hr />
-                </li>
-              ))}
-            </ul>
-            <textarea
-              className="loginInput"
-              value={newComments[review.id] || ''}
-              onChange={(e) => setNewComments({ ...newComments, [review.id]: e.target.value })}
-              placeholder="Add a comment"
-            />
-            <button onClick={() => handleAddComment(review.id)}>Add Comment</button>
-          </div>
-        )}
-      </div>
-    </li>
-  ))}
-</ul>
+                {courtReviews.map((review) => (
+                  <li className="reviewItem" key={review.id}>
+                    <img className="courtReviewImages" src={review.user_photo} alt={review.user_name} />
+                    <div className="reviewDetails">
+                      {editReviewId === review.id ? (
+                        <div>
+                          <textarea
+                            value={editReviewText}
+                            onChange={(e) => setEditReviewText(e.target.value)}
+                            placeholder="Edit your review"
+                          />
+                          <input
+                            type="number"
+                            value={editRating}
+                            onChange={(e) => setEditRating(e.target.value)}
+                            min="1"
+                            max="5"
+                            placeholder="Rate out of 5"
+                          />
+                          <button onClick={handleUpdateReview}>Update Review</button>
+                          <button onClick={() => setEditReviewId(null)}>Cancel</button>
+                        </div>
+                      ) : (
+                        <div>
+                          <h2 className="review">{review.review}</h2>
+                          <p>{review.user_name}</p>
+                          {review.user_id === localStorage.getItem('userId') && (
+                            <button onClick={() => handleEditReview(review.id, review.review, review.rating)}>
+                              Edit Review
+                            </button>
+                          )}
+                        </div>
+                      )}
+  
+                      <button className="showCommentsButton" onClick={() => setCommentsVisible(prev => ({ ...prev, [review.id]: !prev[review.id] }))}>
+                        {commentsVisible[review.id] ? 'Hide Comments' : 'Show Comments'}
+                      </button>
+  
+                      {commentsVisible[review.id] && (
+                        <div className="commentPopup">
+                          <h4>Comments</h4>
+                          <ul>
+                            {(comments[review.id] || []).map((comment) => (
+                              <li key={comment.id}>
+                                <p>{comment.username}: {comment.comment}</p>
+  
+                                {comment.user_id === localStorage.getItem('userId') && (
+                                  <button onClick={() => handleDeleteComment(comment.id, review.id)}>Delete</button>
+                                )}
+                                <hr />
+                              </li>
+                            ))}
+                          </ul>
+                          <textarea
+                            className="loginInput"
+                            value={newComments[review.id] || ''}
+                            onChange={(e) => setNewComments({ ...newComments, [review.id]: e.target.value })}
+                            placeholder="Add a comment"
+                          />
+                          <button onClick={() => handleAddComment(review.id)}>Add Comment</button>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
-
-            
           </div>
-
+  
           <div className="courtRight">
             <p>
               <a href={court.googlemapslink} target="_blank" rel="noopener noreferrer">
@@ -527,5 +596,4 @@ export default function SingleCourt() {
       </div>
     </div>
   );
-
 }

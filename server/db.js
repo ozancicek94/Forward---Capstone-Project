@@ -319,6 +319,19 @@ const fetchCommentsByReviewId = async (review_id) => {
   return response.rows;
 };
 
+// Create a method to update a user's review for a court
+
+const updateReview = async (reviewId, { review, rating }) => {
+  const SQL = `
+    UPDATE reviews
+    SET review = $1, rating = $2
+    WHERE id = $3
+    RETURNING *;
+  `;
+  const response = await client.query(SQL, [review, rating, reviewId]);
+  return response.rows[0];
+};
+
 // Create methods to delete Favorite Courts and Scheduled Events
 
 const deleteFavoriteCourts = async({user_id, id})=> {
@@ -424,6 +437,7 @@ module.exports = {
   fetchUserReviews,
   fetchCourtReviews,
   fetchCommentsByReviewId,
+  updateReview,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   deleteUserReview,
