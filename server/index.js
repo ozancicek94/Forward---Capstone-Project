@@ -498,6 +498,29 @@ const init = async()=> {
     
   ]);
 
+  const comments = await Promise.all([
+    createComment({
+      comment: 'Amazing review! Totally agree with everything.',
+      user_id: Ozan.id, // Ozan's user ID
+      review_id: review1.id // The first review created for Ozan
+    }),
+    createComment({
+      comment: 'Thanks for this review, it helped me a lot!',
+      user_id: Mariana.id, // Mariana's user ID
+      review_id: review2.id // Second review (could be from Ozan or Mariana)
+    }),
+    createComment({
+      comment: 'I didn’t have the same experience, but I respect your opinion.',
+      user_id: Elif.id, // Elif's user ID
+      review_id: review3.id // Third review (adjust review_ids accordingly)
+    }),
+    createComment({
+      comment: 'Great review! I learned something new about this court.',
+      user_id: Sevki.id, // Sevki's user ID
+      review_id: review4.id // Fourth review (adjust review_ids accordingly)
+    })
+  ]);
+
   // console.log(await fetchUserSkills(moe.id));
   // await deleteUserSkill({ user_id: moe.id, id: userSkills[0].id});
   // console.log(await fetchUserSkills(moe.id));
