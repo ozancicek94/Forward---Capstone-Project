@@ -424,6 +424,7 @@ module.exports = {
   fetchScheduledEvents,
   fetchUserReviews,
   fetchCourtReviews,
+  fetchCommentsByReviewId,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   deleteUserReview,

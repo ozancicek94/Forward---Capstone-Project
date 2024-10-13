@@ -20,6 +20,7 @@ const {
   fetchFavoriteCourts,
   fetchUserReviews,
   fetchCourtReviews,
+  fetchCommentsByReviewId,
   deleteFavoriteCourts,
   deleteScheduledEvents,
   deleteUserReview,
