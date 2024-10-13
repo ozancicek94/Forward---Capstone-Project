@@ -27,7 +27,8 @@ const {
   deleteComment,
   authenticate,
   findUserByToken,
-  createNewUser
+  createNewUser,
+  calculateAverageRating
 } = require('./db');
 const express = require('express');
 const app = express();
