@@ -372,13 +372,12 @@ const deleteScheduledEvents = async({user_id, id})=> {
   await client.query(SQL, [ user_id, id ]);
 };
 
-const deleteUserReview = async({user_id, id})=> {
+const deleteReview = async (reviewId) => {
   const SQL = `
-    DELETE
-    FROM reviews
-    WHERE user_id = $1 AND id = $2
+    DELETE FROM reviews
+    WHERE id = $1;
   `;
-  await client.query(SQL, [ user_id, id ]);
+  await client.query(SQL, [reviewId]);
 };
 
 const deleteComment = async ({ user_id, id }) => {

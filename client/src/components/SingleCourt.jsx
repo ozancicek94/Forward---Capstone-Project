@@ -446,6 +446,38 @@ export default function SingleCourt() {
     }
   };
 
+  const handleDeleteReview = async (reviewId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setMessage("Please log in to delete your review.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(
+        `https://forward-capstone-project.onrender.com/api/reviews/${reviewId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+        setCourtReviews((prevReviews) => prevReviews.filter((r) => r.id !== reviewId));
+        setMessage("Review deleted successfully!");
+      } else {
+        const errorData = await response.json();
+        setMessage(`Failed to delete review: ${errorData.message || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error deleting review", error);
+      setMessage("An error occurred while deleting your review.");
+    }
+  };
+
 
   if (!court) return <div>Loading...</div>;
 
@@ -541,9 +573,15 @@ export default function SingleCourt() {
                           <h2 className="review">{review.review}</h2>
                           <p>{review.user_name}</p>
                           {review.user_id === localStorage.getItem('userId') && (
-                            <button onClick={() => handleEditReview(review.id, review.review, review.rating)}>
-                              Edit Review
-                            </button>
+                               <>
+                               <button onClick={() => handleEditReview(review.id, review.review, review.rating)}>
+                                 Edit Review
+                               </button>
+                               <button onClick={() => handleDeleteReview(review.id)}>
+                                 Delete Review
+                               </button>
+                             </>
+                            
                           )}
                         </div>
                       )}
