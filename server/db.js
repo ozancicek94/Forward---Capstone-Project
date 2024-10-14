@@ -460,7 +460,7 @@ module.exports = {
   updateReview,
   deleteFavoriteCourts,
   deleteScheduledEvents,
-  deleteUserReview,
+  deleteReview,
   deleteComment,
   calculateAverageRating,
   authenticate,

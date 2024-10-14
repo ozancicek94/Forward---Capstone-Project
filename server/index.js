@@ -25,7 +25,7 @@ const {
   updateReview,
   deleteFavoriteCourts,
   deleteScheduledEvents,
-  deleteUserReview,
+  deleteReview,
   deleteComment,
   authenticate,
   findUserByToken,
