@@ -268,20 +268,20 @@ app.delete('/api/users/:userId/schedEvents/:id',isLoggedIn, async(req, res, next
   }
 });
 
-app.delete('/api/users/:userId/userReviews/:id',isLoggedIn, async(req, res, next)=> {
-  try {
-    if(req.params.userId !== req.user.id){
-      const error = Error('not authorized');
-      error.status = 401;
-      throw error;
-    }
-    await deleteUserReview({ user_id: req.params.userId, id: req.params.id });
-    res.sendStatus(204);
-  }
-  catch(ex){
-    next(ex);
-  }
-});
+// app.delete('/api/users/:userId/userReviews/:id',isLoggedIn, async(req, res, next)=> {
+//   try {
+//     if(req.params.userId !== req.user.id){
+//       const error = Error('not authorized');
+//       error.status = 401;
+//       throw error;
+//     }
+//     await deleteUserReview({ user_id: req.params.userId, id: req.params.id });
+//     res.sendStatus(204);
+//   }
+//   catch(ex){
+//     next(ex);
+//   }
+// });
 
 app.delete('/api/reviews/:reviewId', isLoggedIn, async (req, res, next) => {
   try {

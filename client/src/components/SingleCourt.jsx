@@ -446,6 +446,8 @@ export default function SingleCourt() {
     }
   };
 
+  // HandleDeleteRewview function
+
   const handleDeleteReview = async (reviewId) => {
     const token = localStorage.getItem("token");
     if (!token) {
