@@ -81,7 +81,7 @@ CREATE TABLE comments (
   id UUID PRIMARY KEY,
   comment TEXT NOT NULL,
   user_id UUID REFERENCES users(id) NOT NULL,
-  review_id UUID REFERENCES reviews(id) NOT NULL,
+  review_id UUID REFERENCES reviews(id) ON DELETE CASCADE,  
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
