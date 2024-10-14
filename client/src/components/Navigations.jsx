@@ -1,26 +1,24 @@
 import { Link } from "react-router-dom";
 import myProfileLogo from '../assets/MyProfileLogo.svg';
 import findCourtsLogo from '../assets/FindCourtsLogo.svg';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 export default function Navigations({ isLoggedIn, setIsLoggedIn }) {
-  const [loading, setLoading] = useState(true); // Add a loading state
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Set the logged-in state based on token existence
-    setLoading(false); // After checking, loading is done
+    
+    if (token) {
+      setIsLoggedIn(true);  // Set logged in if token exists
+    } else {
+      setIsLoggedIn(false);  // Set logged out if no token
+    }
   }, [setIsLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    setIsLoggedIn(false);  // Explicitly set logged out state
   };
-
-  // Render a loading indicator or nothing while checking token
-  if (loading) {
-    return null; // Or you can render a loading spinner if preferred
-  }
 
   return (
     <div className="navbar">
