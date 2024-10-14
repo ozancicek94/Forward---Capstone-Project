@@ -540,6 +540,68 @@ ul {
   width: 28vw;
 }
 
+.addReview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  border: 1px solid black;
+  padding: 2em;
+}
+
+.addReview textarea {
+  width: 95%; /* Make the review textarea wider */
+  height: 2em;
+  padding: 1em;
+  font-size: 1em;
+  resize: vertical;
+}
+
+.addReview input[type="number"] {
+  width: 20%; /* Place the rating input to the right */
+  padding: 10px;
+  font-size: 16px;
+}
+
+.addReview button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background-color:#0033FF;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.addReview button:hover {
+  background-color: #0056b3;
+}
+
+.commentPopup ul {
+  list-style-type: none;  /* Remove bullets */
+  padding: 0;
+}
+
+.commentPopup li {
+  margin-bottom: 15px; /* Add space between each comment */
+}
+
+.commentPopup p {
+  margin: 5px 0;
+}
+
+.commentPopup .commentAuthor {
+  font-weight: bold;
+  text-decoration: underline;
+  margin-bottom: 5px; /* Space between author name and the comment */
+}
+
+.commentPopup .commentText {
+  margin-left: 10px; /* Indent the comment slightly */
+  font-size: 14px;
+}
+
 
 
 
