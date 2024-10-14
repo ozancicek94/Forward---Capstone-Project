@@ -4,20 +4,15 @@ import findCourtsLogo from '../assets/FindCourtsLogo.svg';
 import { useEffect } from 'react';
 
 export default function Navigations({ isLoggedIn, setIsLoggedIn }) {
-  
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    
-    if (token) {
-      setIsLoggedIn(true);  // Set logged in if token exists
-    } else {
-      setIsLoggedIn(false);  // Set logged out if no token
-    }
+    setIsLoggedIn(!!token);  // Set logged in if token exists
   }, [setIsLoggedIn]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);  // Explicitly set logged out state
+    localStorage.removeItem("token");  // Remove token on logout
+    setIsLoggedIn(false);  // Set logged-out state
   };
 
   return (
