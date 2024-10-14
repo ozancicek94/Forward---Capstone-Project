@@ -468,6 +468,7 @@ export default function SingleCourt() {
       );
   
       if (response.ok) {
+        // Remove review from the state
         setCourtReviews((prevReviews) => prevReviews.filter((r) => r.id !== reviewId));
         setMessage("Review deleted successfully!");
       } else {
@@ -479,7 +480,6 @@ export default function SingleCourt() {
       setMessage("An error occurred while deleting your review.");
     }
   };
-
 
   if (!court) return <div>Loading...</div>;
 
