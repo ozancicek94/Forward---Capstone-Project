@@ -1,17 +1,10 @@
 import { Link } from "react-router-dom";
 import myProfileLogo from '../assets/MyProfileLogo.svg';
 import findCourtsLogo from '../assets/FindCourtsLogo.svg';
-import { useEffect } from 'react';
 
 export default function Navigations({ isLoggedIn, setIsLoggedIn }) {
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);  // Set logged in if token exists
-  }, [setIsLoggedIn]);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");  // Remove token on logout
+    localStorage.removeItem("token");  // Remove token from localStorage on logout
     setIsLoggedIn(false);  // Set logged-out state
   };
 
