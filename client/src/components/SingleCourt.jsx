@@ -415,7 +415,7 @@ export default function SingleCourt() {
   
     try {
       const response = await fetch(
-        `https://forward-capstone-project.onrender.com/api/reviews/${editReviewId}`,
+        `/api/reviews/${editReviewId}`,
         {
           method: "PATCH",
           headers: {
