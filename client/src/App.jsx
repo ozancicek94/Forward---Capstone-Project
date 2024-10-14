@@ -12,25 +12,35 @@ import OpeningPageApp from './components/OpeningPage';
 function AppContent() {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);  // New state for loading
 
   // Check if we are on the opening page
   const isOpeningPage = location.pathname === '/';
 
-  // Use effect to check token on page load
+  // Check token on initial page load
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
+
     if (token) {
+      // Optional: validate the token with the server here if necessary
       setIsLoggedIn(true);
     } else {
-      setIsLoggedIn(false); // Ensure the user is logged out initially
+      setIsLoggedIn(false);  // If no token, consider the user logged out
     }
+    
+    setLoading(false);  // After checking the token, set loading to false
   }, []);
 
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem('token'); // Remove the token
-    setIsLoggedIn(false); // Update the logged-in state
+    setIsLoggedIn(false);  // Set logged-in state to false
   };
+
+  // Render loading spinner or initial screen while checking token
+  if (loading) {
+    return <div>Loading...</div>;  // Optionally replace with a loader or splash screen
+  }
 
   return (
     <div className={isOpeningPage ? 'opening-page' : 'blue-page'}>
