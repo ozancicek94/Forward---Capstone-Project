@@ -3,18 +3,24 @@ import myProfileLogo from '../assets/MyProfileLogo.svg';
 import findCourtsLogo from '../assets/FindCourtsLogo.svg';
 import { useState, useEffect } from 'react';
 
-export default function Navigations({isLoggedIn, setIsLoggedIn}) {
-  
+export default function Navigations({ isLoggedIn, setIsLoggedIn }) {
+  const [loading, setLoading] = useState(true); // Add a loading state
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
+    setIsLoggedIn(!!token); // Set the logged-in state based on token existence
+    setLoading(false); // After checking, loading is done
+  }, [setIsLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
   };
+
+  // Render a loading indicator or nothing while checking token
+  if (loading) {
+    return null; // Or you can render a loading spinner if preferred
+  }
 
   return (
     <div className="navbar">
