@@ -341,7 +341,7 @@ const fetchCommentsByReviewId = async (review_id) => {
 
 // Create a method to update a user's review for a court
 
-const updateReview = async (reviewId, { review, rating }) => {
+const updateReview = async ({review, rating,reviewId }) => {
   const SQL = `
     UPDATE reviews
     SET review = $1, rating = $2

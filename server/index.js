@@ -428,7 +428,7 @@ app.patch('/api/reviews/:reviewId', isLoggedIn, async (req, res, next) => {
 
     // Proceed with updating the review
     const updatedReview = await updateReview({
-      id: reviewId,
+      reviewId,
       review,
       rating
     });
