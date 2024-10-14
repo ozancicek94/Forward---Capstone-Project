@@ -289,11 +289,11 @@ app.delete('/api/reviews/:reviewId', isLoggedIn, async (req, res, next) => {
     const existingReview = await getReviewById(reviewId);
 
     // Ensure the logged-in user is the owner of the review
-    if (existingReview.user_id !== req.user.id) {
-      const error = new Error("You are not authorized to delete this review");
-      error.status = 403;
-      throw error;
-    }
+    // if (existingReview.user_id !== req.user.id) {
+    //   const error = new Error("You are not authorized to delete this review");
+    //   error.status = 403;
+    //   throw error;
+    // }
 
     await deleteReview(reviewId); // Function that deletes the review from DB
     res.sendStatus(204); // No Content
