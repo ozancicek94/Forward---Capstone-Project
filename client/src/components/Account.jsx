@@ -214,7 +214,7 @@ export default function Account() {
       <div className="courtList">
         <div className="accountPage">
           <div className="leftContent">
-            <h1>{user.name}'s Account</h1>
+            <h1>{user.name}</h1>
   
             {/* Favorite Courts Section */}
             <div className="favCourts">

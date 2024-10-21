@@ -548,12 +548,12 @@ export default function SingleCourt() {
                       )}
   
                       <button className="showCommentsButton" onClick={() => setCommentsVisible(prev => ({ ...prev, [review.id]: !prev[review.id] }))}>
-                        {commentsVisible[review.id] ? 'Hide Comments' : 'Show Comments'}
+                        {commentsVisible[review.id] ? 'Hide Replies' : 'Show Replies'}
                       </button>
   
                       {commentsVisible[review.id] && (
                         <div className="commentPopup">
-                          <h4>Comments</h4>
+                          <h4>Replies</h4>
                           <ul>
                             {(comments[review.id] || []).map((comment) => (
                               <li key={comment.id}>
@@ -570,9 +570,9 @@ export default function SingleCourt() {
                             className="loginInput"
                             value={newComments[review.id] || ''}
                             onChange={(e) => setNewComments({ ...newComments, [review.id]: e.target.value })}
-                            placeholder="Add a comment"
+                            placeholder="Add a reply"
                           />
-                          <button onClick={() => handleAddComment(review.id)}>Add Comment</button>
+                          <button onClick={() => handleAddComment(review.id)}>Reply</button>
                         </div>
                       )}
                     </div>
