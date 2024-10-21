@@ -27,6 +27,7 @@ export default function Register () {
       });
       const response = await request.json();
       console.log(response);
+      navigate("/login");
       if(response.token) {
         localStorage.setItem("token", response.token);
         // navigate("/")

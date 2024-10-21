@@ -234,47 +234,6 @@ export default function SingleCourt() {
     }
   };
 
-  // const handleUpdate = async() => {
-
-  //   const token = localStorage.getItem("token");
-
-  //   if(!token) {
-  //     setMessage("Please log in to update court's rating and review");
-  //     return
-  //   }
-
-  //   try{
-  //     const request = await fetch(`https://forward-capstone-project.onrender.com/api/courts/${court.id}`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization:`Bearer ${token}`
-  //       },
-  //       body: JSON.stringify({
-  //         rating,
-  //         review
-  //       })
-  //     });
-
-  //     const response = await request.json();
-
-  //     if(request.ok) {
-  //       setCourt((prevCourt) => ({
-  //         ...prevCourt,
-  //         rating: response.rating,
-  //         review: response.review,
-  //       }));
-  //       setMessage("Court information updated successfully")
-  //     } else {
-  //       setMessage(response.error || "Failed to update court information")
-  //     }
-  //   } catch(error) {
-  //     console.error("Error updating court information", error);
-  //     setMessage ("And error occured while updating court information")
-  //   }
-
-  // };
-
   const handleAddToFavorites = async () => {
     const token = localStorage.getItem("token");
 
